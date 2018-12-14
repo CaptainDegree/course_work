@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewData["Title"] = "Register";
+}
+
+<html>
+    <head>
+        <title>@ViewData["Title"]</title>
+    </head>
+    <body>
+        <h1>@ViewData["Title"]</h1>
+
+        @using (Html.BeginForm("TargetAction", "TargetController"))
+        {
+            @Html.TextBox("user", "Timothy")<br />
+            @Html.Password("password", "123456")<br />
+            <input type="submit" value="Login" /><br />
+        }
+    </body>
+</html>
