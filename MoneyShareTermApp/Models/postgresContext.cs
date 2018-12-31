@@ -40,8 +40,6 @@ namespace MoneyShareTermApp.Models
 
             modelBuilder.Entity<Commentary>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.HasOne(d => d.Mailer)
                     .WithMany(p => p.Commentary)
                     .HasForeignKey(d => d.MailerId)
@@ -55,11 +53,6 @@ namespace MoneyShareTermApp.Models
                     .HasConstraintName("commentary_post_id_fkey");
             });
 
-            modelBuilder.Entity<CurrencySet>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-            });
-
             modelBuilder.Entity<File>(entity =>
             {
                 entity.HasIndex(e => e.Link)
@@ -70,8 +63,6 @@ namespace MoneyShareTermApp.Models
                     .HasName("file_name_key")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.File)
                     .HasForeignKey(d => d.PostId)
@@ -80,8 +71,6 @@ namespace MoneyShareTermApp.Models
 
             modelBuilder.Entity<Message>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.HasOne(d => d.Mailer)
                     .WithMany(p => p.Message)
                     .HasForeignKey(d => d.MailerId)
@@ -101,15 +90,8 @@ namespace MoneyShareTermApp.Models
                     .HasConstraintName("message_target_id_fkey");
             });
 
-            modelBuilder.Entity<MoneyMailer>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-            });
-
             modelBuilder.Entity<MoneyTransfer>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.MoneyTransfer)
                     .HasForeignKey(d => d.AccountId)
@@ -135,7 +117,7 @@ namespace MoneyShareTermApp.Models
                     .HasName("person_login_key")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Hidden).HasDefaultValueSql("false");
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.PersonAccount)
@@ -175,8 +157,6 @@ namespace MoneyShareTermApp.Models
 
             modelBuilder.Entity<Post>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.HasOne(d => d.Mailer)
                     .WithMany(p => p.Post)
                     .HasForeignKey(d => d.MailerId)
@@ -197,8 +177,6 @@ namespace MoneyShareTermApp.Models
 
             modelBuilder.Entity<Subscription>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
                 entity.HasOne(d => d.Mailer)
                     .WithMany(p => p.Subscription)
                     .HasForeignKey(d => d.MailerId)

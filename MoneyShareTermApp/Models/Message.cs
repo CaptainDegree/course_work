@@ -16,7 +16,7 @@ namespace MoneyShareTermApp.Models
         public int TargetId { get; set; }
         [Column("mailer_id")]
         public int MailerId { get; set; }
-        [Column("time", TypeName = "date")]
+        [Column("time")]
         public DateTime Time { get; set; }
         [Required]
         [Column("text")]

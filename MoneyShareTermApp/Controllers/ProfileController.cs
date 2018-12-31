@@ -11,12 +11,7 @@ namespace MoneyShareTermApp.Controllers
 {
     public class ProfileController : Controller
     {
-        private readonly postgresContext _context;
-
-        public ProfileController(postgresContext context)
-        {
-            _context = context;
-        }
+        private readonly postgresContext _context = new postgresContext();
         
         // GET: Profile
         public async Task<IActionResult> Index()
@@ -29,59 +24,50 @@ namespace MoneyShareTermApp.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var person = await _context.Person
-                .Include(p => p.Account)
-                .Include(p => p.CommentPrice)
-                .Include(p => p.Mailer)
-                .Include(p => p.MessagePrice)
                 .Include(p => p.Photo)
-                .Include(p => p.SubscriptionPrice)
+                .Include(p => p.Birthday)
+                .Include(p => p.FirstName)
+                .Include(p => p.SecondName)
+                .Include(p => p.MiddleName)
+                .Include(p => p.PhoneNumber)
+                .Include(p => p.Post)
+                .Include(p => p.SubscriptionPerson)
+                .Include(p => p.SubscriptionSubscriber)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (person == null)
-            {
                 return NotFound();
-            }
 
             return View(person);
         }
 
-        //// GET: Profile/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["AccountId"] = new SelectList(_context.CurrencySet, "Id", "Id");
-        //    ViewData["CommentPriceId"] = new SelectList(_context.CurrencySet, "Id", "Id");
-        //    ViewData["MailerId"] = new SelectList(_context.MoneyMailer, "Id", "Id");
-        //    ViewData["MessagePriceId"] = new SelectList(_context.CurrencySet, "Id", "Id");
-        //    ViewData["PhotoId"] = new SelectList(_context.File, "Id", "Link");
-        //    ViewData["SubscriptionPriceId"] = new SelectList(_context.CurrencySet, "Id", "Id");
-        //    return View();
-        //}
+        // GET: Profile/Create
+        public IActionResult Create()
+        {
+            
+            ViewData["PhotoId"] = new SelectList(_context.File, "Id", "Link");
+            return View();
+        }
 
         // POST: Profile/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("Id,AccountId,MessagePriceId,CommentPriceId,SubscriptionPriceId,PhotoId,MailerId,Birthday,FirstName,MiddleName,SecondName,RegistrationTime,Password,Login,PhoneNumber,Email,Hidden")] Person person)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(person);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["AccountId"] = new SelectList(_context.CurrencySet, "Id", "Id", person.AccountId);
-        //    ViewData["CommentPriceId"] = new SelectList(_context.CurrencySet, "Id", "Id", person.CommentPriceId);
-        //    ViewData["MailerId"] = new SelectList(_context.MoneyMailer, "Id", "Id", person.MailerId);
-        //    ViewData["MessagePriceId"] = new SelectList(_context.CurrencySet, "Id", "Id", person.MessagePriceId);
-        //    ViewData["PhotoId"] = new SelectList(_context.File, "Id", "Link", person.PhotoId);
-        //    ViewData["SubscriptionPriceId"] = new SelectList(_context.CurrencySet, "Id", "Id", person.SubscriptionPriceId);
-        //    return View(person);
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([ModelBinder(BinderType = typeof(PersonModelBinder))] Person person)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(person);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(person);
+        }
 
         // GET: Profile/Edit/5
         //public async Task<IActionResult> Edit(int? id)

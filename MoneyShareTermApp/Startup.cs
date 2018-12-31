@@ -57,7 +57,7 @@ namespace MoneyShareTermApp
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Register}/{id?}");
+                    template: "{controller=Profile}/{action=Create}/{id?}");
             });
         }
     }

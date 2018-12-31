@@ -12,8 +12,6 @@ namespace MoneyShareTermApp.Models
         {
             MessagePerson = new HashSet<Message>();
             MessageTarget = new HashSet<Message>();
-            MoneyTransferPerson = new HashSet<MoneyTransfer>();
-            MoneyTransferTarget = new HashSet<MoneyTransfer>();
             Post = new HashSet<Post>();
             SubscriptionPerson = new HashSet<Subscription>();
             SubscriptionSubscriber = new HashSet<Subscription>();
@@ -33,6 +31,7 @@ namespace MoneyShareTermApp.Models
         public int? PhotoId { get; set; }
         [Column("mailer_id")]
         public int MailerId { get; set; }
+        [Required]
         [Column("birthday", TypeName = "date")]
         public DateTime Birthday { get; set; }
         [Required]
@@ -44,11 +43,12 @@ namespace MoneyShareTermApp.Models
         [Required]
         [Column("second_name")]
         public string SecondName { get; set; }
-        [Column("registration_time", TypeName = "date")]
-        public DateTime RegistrationTime { get; set; }
+        [Column("registration_time")]
+        public DateTime? RegistrationTime { get; set; }
         [Required]
         [Column("password")]
         public string Password { get; set; }
+        [Required]
         [Column("login")]
         public string Login { get; set; }
         [Required]
@@ -82,10 +82,6 @@ namespace MoneyShareTermApp.Models
         public virtual ICollection<Message> MessagePerson { get; set; }
         [InverseProperty("Target")]
         public virtual ICollection<Message> MessageTarget { get; set; }
-        [InverseProperty("Person")]
-        public virtual ICollection<MoneyTransfer> MoneyTransferPerson { get; set; }
-        [InverseProperty("Target")]
-        public virtual ICollection<MoneyTransfer> MoneyTransferTarget { get; set; }
         [InverseProperty("Person")]
         public virtual ICollection<Post> Post { get; set; }
         [InverseProperty("Person")]

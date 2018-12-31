@@ -16,7 +16,7 @@ namespace MoneyShareTermApp.Models
         public int TargetId { get; set; }
         [Column("account_id")]
         public int AccountId { get; set; }
-        [Column("time", TypeName = "date")]
+        [Column("time")]
         public DateTime Time { get; set; }
         [Column("type")]
         public char Type { get; set; }
@@ -26,9 +26,9 @@ namespace MoneyShareTermApp.Models
         public virtual CurrencySet Account { get; set; }
         [ForeignKey("PersonId")]
         [InverseProperty("MoneyTransferPerson")]
-        public virtual Person Person { get; set; }
+        public virtual MoneyMailer Person { get; set; }
         [ForeignKey("TargetId")]
         [InverseProperty("MoneyTransferTarget")]
-        public virtual Person Target { get; set; }
+        public virtual MoneyMailer Target { get; set; }
     }
 }
