@@ -1,7 +1,8 @@
 ﻿@model MoneyShareTermApp.Models.Person
+@{ Layout = null; }
 
 @{
-    ViewData["Title"] = "Create";
+ViewData["Title"] = "Create";
 }
 
 <h1>Create</h1>
@@ -15,12 +16,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
-                <label>Comment Price in</label><br/>
+                <label>Comment Price in</label><br />
 
                 <label asp-for="CommentPrice.Euro" class="control-label"></label>
                 <input asp-for="CommentPrice.Euro" class="form-control" />
                 <span asp-validation-for="CommentPrice.Euro" class="text-danger"></span>
-               
+
                 <label asp-for="CommentPrice.Ruble" class="control-label"></label>
                 <input asp-for="CommentPrice.Ruble" class="form-control" />
                 <span asp-validation-for="CommentPrice.Ruble" class="text-danger"></span>
@@ -29,9 +30,8 @@
                 <input asp-for="CommentPrice.Dollar" class="form-control" />
                 <span asp-validation-for="CommentPrice.Dollar" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label>Message Price in</label><br/>
+                <label>Message Price in</label><br />
 
                 <label asp-for="MessagePrice.Euro" class="control-label"></label>
                 <input asp-for="MessagePrice.Euro" class="form-control" />
@@ -45,9 +45,8 @@
                 <input asp-for="MessagePrice.Dollar" class="form-control" />
                 <span asp-validation-for="MessagePrice.Dollar" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label>Subscription Price in</label><br/>
+                <label>Subscription Price in</label><br />
 
                 <label asp-for="SubscriptionPrice.Euro" class="control-label"></label>
                 <input asp-for="SubscriptionPrice.Euro" class="form-control" />
@@ -61,7 +60,6 @@
                 <input asp-for="SubscriptionPrice.Dollar" class="form-control" />
                 <span asp-validation-for="SubscriptionPrice.Dollar" class="text-danger"></span>
             </div>
-
             <div class="form-group">
                 <label asp-for="Birthday" class="control-label"></label>
                 <input asp-for="Birthday" type="date" class="form-control" />
@@ -78,7 +76,7 @@
                 <span asp-validation-for="MiddleName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SecondName" class="control-label"Second name></label>
+                <label asp-for="SecondName" class="control-label" Second name></label>
                 <input asp-for="SecondName" class="form-control" />
                 <span asp-validation-for="SecondName" class="text-danger"></span>
             </div>

@@ -4,109 +4,35 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
-
 <div>
-    <h4>Person</h4>
+    <h4>@Model.SecondName @Model.FirstName @Model.MiddleName</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Birthday)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Birthday)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MiddleName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MiddleName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SecondName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SecondName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RegistrationTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RegistrationTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Login)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Login)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Hidden)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Hidden)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Account)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Account.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CommentPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CommentPrice.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Mailer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Mailer.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MessagePrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MessagePrice.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Photo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Photo.Link)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SubscriptionPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SubscriptionPrice.Id)
-        </dd>
-    </dl>
+    <img src="@Model.Photo"/>
+    <hr />
+    <h5>счет</h5>
+    <ul>
+        <li><div>$</div><div>@Model.Account.Dollar</div></li>
+        <li><div>€</div><div>@Model.Account.Euro</div></li>
+        <li><div>₽</div><div>@Model.Account.Ruble</div></li>
+    </ul>
+    <hr />
+    <a asp-action="Write">написать</a>
+
+    <div>
+        <h3>описание</h3>
+        <ul>
+            <li><div>День рождения: </div><div>@Model.Birthday.Date</div></li>
+            <li><div>Логин: </div><div>@Model.Login</div></li>
+            <li><div>Телефон: </div><div>@Model.PhoneNumber</div></li>
+        </ul>
+    </div>
+
+    <div>
+        <ul>
+
+        </ul>
+    </div>
+
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |

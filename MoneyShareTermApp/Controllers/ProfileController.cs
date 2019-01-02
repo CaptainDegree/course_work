@@ -27,12 +27,8 @@ namespace MoneyShareTermApp.Controllers
                 return NotFound();
 
             var person = await _context.Person
+                .Include(p => p.Account)
                 .Include(p => p.Photo)
-                .Include(p => p.Birthday)
-                .Include(p => p.FirstName)
-                .Include(p => p.SecondName)
-                .Include(p => p.MiddleName)
-                .Include(p => p.PhoneNumber)
                 .Include(p => p.Post)
                 .Include(p => p.SubscriptionPerson)
                 .Include(p => p.SubscriptionSubscriber)

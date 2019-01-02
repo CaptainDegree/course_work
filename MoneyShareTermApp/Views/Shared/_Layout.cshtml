@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewData["Title"]</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <header class="card-header header">
+        <div>
+            Это хэдер
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="navbar">
+            <ul> @*можно сделать ol и добавить картинки (как в вк)*@
+                <li><a asp-controller="Profile" asp-action="Details">профиль</a></li>
+                <li><a asp-controller="" asp-action="">лента</a></li>
+                <li><a asp-controller="Profile" asp-action="">беседы</a></li>
+                <li><a asp-controller="Profile" asp-action="">люди</a></li>
+                <li><a asp-controller="Profile" asp-action="">настройки</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            @RenderBody()
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div>
+            это футер
+        </div>
+    </footer>
+</body>
+</html>

@@ -43,8 +43,6 @@ namespace MoneyShareTermApp.Models
         [Required]
         [Column("second_name")]
         public string SecondName { get; set; }
-        [Column("registration_time")]
-        public DateTime? RegistrationTime { get; set; }
         [Required]
         [Column("password")]
         public string Password { get; set; }
