@@ -42,9 +42,10 @@ html {
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    background-color: #f4f4f6;
 }
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -55,28 +56,131 @@ body {
   line-height: 60px; /* Vertically center the text there */
 }
 
-/*main container*/
 .container {
     display: grid;
-    grid-template-columns: 20% 30% auto;
+    grid-template-columns: 20% auto;
     grid-template-rows: auto;
-    grid-template-areas: "header header" 
-                         "nav content"
-                         "footer footer";
+    grid-template-areas: "nav content";
+    align-items: start;
+    grid-gap: 10px 10px;
 }
 
-.content {
+.contatiner .content {
     grid-area: content;
 }
 
-.navbar {
+.container .navbar {
     grid-area: nav;
 }
 
-.header {
-    grid-area: header;
+/*Details styles*/
+.details {
+    display: grid;
+    grid-gap: 10px 10px;
+    grid-template-columns: 40% auto;
+    grid-template-rows: auto;
+    grid-template-areas: "brief description"
+                         "posts posts";
 }
 
-.footer {
-    grid-area: footer;
+.details .brief {
+    grid-area: brief;
+}
+
+.details .description {
+    grid-area: description;
+}
+
+.profile-img {
+    width: 150px;
+    height: auto;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+.navbar ul li .btn {
+    min-width: 105px;
+    text-align: left;
+}
+
+ul {
+    padding: 0;
+}
+
+.btn {
+    background-color: #d1d1d1;
+    border-color: #d1d1d1;
+}
+
+.btn:hover {
+    color: black;
+    background-color: darkgray;
+    border-color: #d1d1d1;
+}
+
+.post-list {
+    grid-area: posts;
+    min-width: 600px;
+}
+
+.post {
+    border-color: darkgray;
+    background-color: ivory;
+    border-width: 2px;
+    padding: 10px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-row-gap: 10px;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: auto;
+    grid-template-areas: "author date" 
+                         "text text"
+                         "file file"
+                         ". account";
+}
+
+.post .author {
+    grid-area: author;
+}
+
+.post .author img {
+    max-width: 30px;
+}
+
+.post .time {
+    grid-area: date;
+    text-align: right;
+}
+
+.post .text {
+    grid-area: text;
+}
+
+.post .img {
+    grid-area: file;
+    max-width: 500px;
+}
+
+.post .file {
+    grid-area: file;
+}
+
+.post .acc {
+    grid-area: account;
+    text-align: right;
+}
+
+.post .acc span {
+    margin-right: 10px;
+}
+
+/*news page*/
+.news {
+    grid-area: content;
 }

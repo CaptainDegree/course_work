@@ -20,11 +20,11 @@ namespace MoneyShareTermApp.Models
         [Column("id")]
         public int Id { get; set; }
         [Column("euro", TypeName = "numeric")]
-        public decimal? Euro { get; set; }
+        public decimal Euro { get; set; }
         [Column("ruble", TypeName = "numeric")]
-        public decimal? Ruble { get; set; }
+        public decimal Ruble { get; set; }
         [Column("dollar", TypeName = "numeric")]
-        public decimal? Dollar { get; set; }
+        public decimal Dollar { get; set; }
 
         [InverseProperty("Account")]
         public virtual ICollection<MoneyTransfer> MoneyTransfer { get; set; }

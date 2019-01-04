@@ -59,10 +59,6 @@ namespace MoneyShareTermApp.Models
                     .HasName("file_link_key")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Name)
-                    .HasName("file_name_key")
-                    .IsUnique();
-
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.File)
                     .HasForeignKey(d => d.PostId)

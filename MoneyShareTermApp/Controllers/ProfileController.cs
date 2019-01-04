@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoneyShareTermApp.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MoneyShareTermApp.Controllers
 {
     public class ProfileController : Controller
     {
         private readonly postgresContext _context = new postgresContext();
-        
+
         // GET: Profile
         public async Task<IActionResult> Index()
         {
@@ -30,6 +27,9 @@ namespace MoneyShareTermApp.Controllers
                 .Include(p => p.Account)
                 .Include(p => p.Photo)
                 .Include(p => p.Post)
+                .Include("Post.Mailer")
+                .Include("Post.Mailer.MoneyTransferTarget")
+                .Include("Post.File")
                 .Include(p => p.SubscriptionPerson)
                 .Include(p => p.SubscriptionSubscriber)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -37,15 +37,15 @@ namespace MoneyShareTermApp.Controllers
             if (person == null)
                 return NotFound();
 
+            ViewData["PersonId"] = person.Id;
+
             return View(person);
         }
 
         // GET: Profile/Create
         public IActionResult Create()
         {
-            
-            ViewData["PhotoId"] = new SelectList(_context.File, "Id", "Link");
-            return View();
+            return View(); // добавить поддержку фото 
         }
 
         // POST: Profile/Create
@@ -167,5 +167,22 @@ namespace MoneyShareTermApp.Controllers
         //{
         //    return _context.Person.Any(e => e.Id == id);
         //}
+
+        //  GET: Profile/Posts/5
+        public async Task<IActionResult> Posts(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            return View(await _context.Post
+                .Where(p => p.PersonId == id ||
+                p.Person.SubscriptionSubscriber.Any(s => s.Id == id))
+                .Include(p => p.Mailer)
+                    .ThenInclude(p => p.MoneyTransferTarget)
+                .Include(p => p.File)
+                .Include(p => p.Person)
+                    .ThenInclude(p => p.Photo)
+                .ToListAsync());
+        }
     }
 }

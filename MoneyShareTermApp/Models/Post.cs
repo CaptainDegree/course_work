@@ -23,8 +23,6 @@ namespace MoneyShareTermApp.Models
         public int? PostId { get; set; }
         [Column("mailer_id")]
         public int MailerId { get; set; }
-        [Column("time")]
-        public DateTime Time { get; set; }
         [Column("text")]
         public string Text { get; set; }
 

@@ -16,7 +16,12 @@ namespace MoneyShareTermApp.Models
             Func<string, string> getFromForm = (string param) => bindingContext.HttpContext.Request.Form[param];
 
             var person = new Person();
-            person.Account = new CurrencySet();
+            person.Account = new CurrencySet()
+            {
+                Euro = 0,
+                Ruble = 0,
+                Dollar = 0
+            };
             person.CommentPrice = new CurrencySet()
             {
                 Euro = decimal.Parse(getFromForm("CommentPrice.Euro")),

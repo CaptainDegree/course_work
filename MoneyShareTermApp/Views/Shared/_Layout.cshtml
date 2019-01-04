@@ -25,11 +25,11 @@
     <div class="container">
         <nav class="navbar">
             <ul> @*можно сделать ol и добавить картинки (как в вк)*@
-                <li><a asp-controller="Profile" asp-action="Details">профиль</a></li>
-                <li><a asp-controller="" asp-action="">лента</a></li>
-                <li><a asp-controller="Profile" asp-action="">беседы</a></li>
-                <li><a asp-controller="Profile" asp-action="">люди</a></li>
-                <li><a asp-controller="Profile" asp-action="">настройки</a></li>
+                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="Details">профиль</a></li>
+                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="Posts" asp-route-id="@ViewData["PersonId"]">лента</a></li>
+                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="">беседы</a></li>
+                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="">люди</a></li>
+                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="">настройки</a></li>
             </ul>
         </nav>
 
@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <footer class="footer">
+    <footer class="card-footer">
         <div>
             это футер
         </div>

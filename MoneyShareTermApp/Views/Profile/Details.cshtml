@@ -4,32 +4,37 @@
     ViewData["Title"] = "Details";
 }
 
-<div>
-    <h4>@Model.SecondName @Model.FirstName @Model.MiddleName</h4>
-    <hr />
-    <img src="@Model.Photo"/>
-    <hr />
-    <h5>счет</h5>
-    <ul>
-        <li><div>$</div><div>@Model.Account.Dollar</div></li>
-        <li><div>€</div><div>@Model.Account.Euro</div></li>
-        <li><div>₽</div><div>@Model.Account.Ruble</div></li>
-    </ul>
-    <hr />
-    <a asp-action="Write">написать</a>
+<div class="details">
+    <div class="brief">
+        <h4>@Model.SecondName @Model.FirstName @Model.MiddleName</h4>
+        <hr />
+        <img class="profile-img" src="~/images/@Model.Photo.Link"/>
+        <hr />
+        <h5>счет</h5>
+        <ul>
+            <li><div>$ @Model.Account.Dollar</div></li>
+            <li><div>€ @Model.Account.Euro</div></li>
+            <li><div>₽ @Model.Account.Ruble</div></li>
+        </ul>
+        <hr />
+        <button type="button" asp-action="Write" class="btn">написать</button>
+    </div>
 
-    <div>
+    <div class="description">
         <h3>описание</h3>
         <ul>
-            <li><div>День рождения: </div><div>@Model.Birthday.Date</div></li>
+            <li><div>День рождения: </div><div>@Model.Birthday.ToShortDateString()</div></li>
             <li><div>Логин: </div><div>@Model.Login</div></li>
             <li><div>Телефон: </div><div>@Model.PhoneNumber</div></li>
         </ul>
     </div>
 
-    <div>
+    <div class="post-list">
         <ul>
-
+            @foreach(var post in Model.Post)
+            {
+                @await Html.PartialAsync("_PostTile", post)
+            }
         </ul>
     </div>
 

@@ -1,0 +1,8 @@
+﻿@model IEnumerable<MoneyShareTermApp.Models.Post>
+
+<div class="news">
+    @foreach(var post in Model)
+    {
+        @await Html.PartialAsync("_PostTile", post);
+    }
+</div>
