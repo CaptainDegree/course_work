@@ -17,12 +17,12 @@
             <div class="file"><a link="~/files/@file.Link"></a></div>
         }
     }
-    @{decimal Euro = 0, Ruble = 0, Dollar = 0;} @*TODO возложить это на бд*@
+    @{decimal Euro = 0, Ruble = 0, Dollar = 0;} @{/*TODO возложить это на бд*/}
     @foreach (var trans in Model.Mailer.MoneyTransferTarget)
     {
         Euro += trans.Account.Euro;
         Ruble += trans.Account.Ruble;
         Dollar += trans.Account.Dollar;
     }
-    <div class="acc"><span>$ @Dollar</span><span>€ @Euro</span><span>₽ @Ruble</span></div> @*TODO сделать из них кнопки*@
+    <div class="acc"><span>$ @Dollar</span><span>€ @Euro</span><span>₽ @Ruble</span></div> @{/*TODO сделать из них кнопки*/}
 </div>

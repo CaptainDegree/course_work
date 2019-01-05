@@ -27,23 +27,23 @@ namespace MoneyShareTermApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //string connection = Configuration.GetConnectionString("DefaultConnection");
-            //services.AddDbContext<UserContext>(options => options.UseSqlServer(connection));
+            string connection = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<postgresContext>(options => options.UseSqlServer(connection));
 
-            //// установка конфигурации подключения
-            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //    .AddCookie(options => //CookieAuthenticationOptions
-            //    {
-            //        options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
-            //    });
-            //// old
+            // установка конфигурации подключения
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => //CookieAuthenticationOptions
+                {
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                });
+
+            // old
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -66,11 +66,13 @@ namespace MoneyShareTermApp
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Profile}/{action=Create}/{id?}");
+                    template: "{controller=Profile}/{action=Register}/{id?}");
             });
         }
     }

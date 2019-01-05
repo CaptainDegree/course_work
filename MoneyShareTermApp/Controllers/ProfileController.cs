@@ -1,7 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoneyShareTermApp.Models;
+using MoneyShareTermApp.ViewModels;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MoneyShareTermApp.Controllers
@@ -18,6 +24,7 @@ namespace MoneyShareTermApp.Controllers
         }
 
         // GET: Profile/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -42,27 +49,82 @@ namespace MoneyShareTermApp.Controllers
             return View(person);
         }
 
-        // GET: Profile/Create
-        public IActionResult Create()
+        // GET: Profile/Register
+        public IActionResult Register()
         {
             return View(); // добавить поддержку фото 
         }
 
-        // POST: Profile/Create
+        // GET: Profile/Login
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                Person user = await _context.Person.FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+
+                if (user != null)
+                {
+                    await Authenticate(model.Email); // аутентификация
+
+                    return RedirectToAction();
+                }
+                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
+            }
+            return View(model);
+        }
+
+        // POST: Profile/Register
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([ModelBinder(BinderType = typeof(PersonModelBinder))] Person person)
+        public async Task<IActionResult> Register([ModelBinder(BinderType = typeof(PersonModelBinder))] Person person)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(person);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                Person user = await _context.Person.FirstOrDefaultAsync(u => u.Email == person.Email);
+
+                if (user == null)
+                {
+                    _context.Add(person);
+                    await _context.SaveChangesAsync();
+
+                    await Authenticate(person.Email); // аутентификация
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             }
 
             return View(person);
+        }
+
+        private async Task Authenticate(string userName)
+        {
+            // создаем один claim
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+            };
+            // создаем объект ClaimsIdentity
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            // установка аутентификационных куки
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Profile");
         }
 
         // GET: Profile/Edit/5
@@ -169,6 +231,7 @@ namespace MoneyShareTermApp.Controllers
         //}
 
         //  GET: Profile/Posts/5
+        [Authorize]
         public async Task<IActionResult> Posts(int? id)
         {
             if (id == null)
@@ -182,6 +245,7 @@ namespace MoneyShareTermApp.Controllers
                 .Include(p => p.File)
                 .Include(p => p.Person)
                     .ThenInclude(p => p.Photo)
+                .OrderBy(p => p.Mailer.CreationTime)
                 .ToListAsync());
         }
     }

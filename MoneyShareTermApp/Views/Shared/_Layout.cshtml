@@ -24,7 +24,7 @@
 
     <div class="container">
         <nav class="navbar">
-            <ul> @*можно сделать ol и добавить картинки (как в вк)*@
+            <ul> @{ /*TODO можно сделать ol и добавить картинки (как в вк)*/ }
                 <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="Details">профиль</a></li>
                 <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="Posts" asp-route-id="@ViewData["PersonId"]">лента</a></li>
                 <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="">беседы</a></li>

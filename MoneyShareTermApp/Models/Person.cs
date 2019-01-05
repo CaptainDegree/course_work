@@ -44,6 +44,7 @@ namespace MoneyShareTermApp.Models
         [Column("second_name")]
         public string SecondName { get; set; }
         [Required]
+        [DataType(DataType.Password)]
         [Column("password")]
         public string Password { get; set; }
         [Required]
@@ -53,6 +54,7 @@ namespace MoneyShareTermApp.Models
         [Column("phone_number")]
         public string PhoneNumber { get; set; }
         [Required]
+        [EmailAddress]
         [Column("email")]
         public string Email { get; set; }
         [Column("hidden")]
