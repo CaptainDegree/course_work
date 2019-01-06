@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MoneyShareTermApp.Models
+namespace MoneyShareTermApp.TestModels
 {
     [Table("person")]
     public partial class Person
@@ -31,9 +31,6 @@ namespace MoneyShareTermApp.Models
         public int? PhotoId { get; set; }
         [Column("mailer_id")]
         public int MailerId { get; set; }
-        [Column("role_id")]
-        public int RoleId { get; set; }
-        [Required]
         [Column("birthday", TypeName = "date")]
         public DateTime Birthday { get; set; }
         [Required]
@@ -45,16 +42,11 @@ namespace MoneyShareTermApp.Models
         [Required]
         [Column("second_name")]
         public string SecondName { get; set; }
+        [Column("registration_time")]
+        public DateTime RegistrationTime { get; set; }
         [Required]
-        [DataType(DataType.Password)]
         [Column("password")]
         public string Password { get; set; }
-        [Required]
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Пароль введен неверно")]
-        [NotMapped] // only for validating password
-        [Column("password")]
-        public string ConfirmPassword { get; set; }
         [Required]
         [Column("login")]
         public string Login { get; set; }
@@ -62,11 +54,12 @@ namespace MoneyShareTermApp.Models
         [Column("phone_number")]
         public string PhoneNumber { get; set; }
         [Required]
-        [EmailAddress]
         [Column("email")]
         public string Email { get; set; }
         [Column("hidden")]
         public bool? Hidden { get; set; }
+        [Column("role_id")]
+        public int RoleId { get; set; }
 
         [ForeignKey("AccountId")]
         [InverseProperty("PersonAccount")]
@@ -83,14 +76,14 @@ namespace MoneyShareTermApp.Models
         [ForeignKey("PhotoId")]
         [InverseProperty("Person")]
         public virtual File Photo { get; set; }
-        [ForeignKey("SubscriptionPriceId")]
-        [InverseProperty("PersonSubscriptionPrice")]
-        public virtual CurrencySet SubscriptionPrice { get; set; }
         [ForeignKey("RoleId")]
         [InverseProperty("Person")]
         public virtual Role Role { get; set; }
-
+        [ForeignKey("SubscriptionPriceId")]
+        [InverseProperty("PersonSubscriptionPrice")]
+        public virtual CurrencySet SubscriptionPrice { get; set; }
         [InverseProperty("Person")]
+
         public virtual ICollection<Message> MessagePerson { get; set; }
         [InverseProperty("Target")]
         public virtual ICollection<Message> MessageTarget { get; set; }

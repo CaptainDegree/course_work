@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace MoneyShareTermApp.Models
+namespace MoneyShareTermApp.TestModels
 {
     public partial class postgresContext : DbContext
     {
@@ -37,17 +37,6 @@ namespace MoneyShareTermApp.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //
-            string adminRoleName = "admin";
-            string userRoleName = "user";
-
-            // добавляем роли
-            Role userRole = new Role { Id = 1, Name = userRoleName };
-            Role adminRole = new Role { Id = 2, Name = adminRoleName };
-
-            modelBuilder.Entity<Role>().HasData(new Role[] { adminRole, userRole });
-            base.OnModelCreating(modelBuilder);
-            //
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<Commentary>(entity =>
@@ -130,6 +119,8 @@ namespace MoneyShareTermApp.Models
                     .IsUnique();
 
                 entity.Property(e => e.Hidden).HasDefaultValueSql("false");
+
+                entity.Property(e => e.RegistrationTime).HasDefaultValueSql("now()");
 
                 entity.Property(e => e.RoleId).HasDefaultValueSql("1");
 

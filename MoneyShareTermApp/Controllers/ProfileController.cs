@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MoneyShareTermApp.Models;
 using MoneyShareTermApp.ViewModels;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace MoneyShareTermApp.Controllers
         }
 
         // GET: Profile/Details/5
-        [Authorize]
+        [Authorize] // TODO далее распределить по ролям: [Authorize(Roles = "admin, user")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -63,15 +64,16 @@ namespace MoneyShareTermApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                Person user = await _context.Person.FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+                Person user = await _context.Person.Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
 
                 if (user != null)
                 {
-                    await Authenticate(model.Email); // аутентификация
+                    await Authenticate(user); // аутентификация
 
                     return RedirectToAction();
                 }
@@ -93,10 +95,14 @@ namespace MoneyShareTermApp.Controllers
 
                 if (user == null)
                 {
+                    Role userRole = await _context.Role.FirstOrDefaultAsync(r => r.Name == "user");
+                    if (userRole != null)
+                        person.Role = userRole; // для аутентификации нужно добавить роль
+
                     _context.Add(person);
                     await _context.SaveChangesAsync();
 
-                    await Authenticate(person.Email); // аутентификация
+                    await Authenticate(person); // аутентификация
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -107,12 +113,13 @@ namespace MoneyShareTermApp.Controllers
             return View(person);
         }
 
-        private async Task Authenticate(string userName)
+        private async Task Authenticate(Person user)
         {
             // создаем один claim
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Name)
             };
             // создаем объект ClaimsIdentity
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
@@ -247,6 +254,11 @@ namespace MoneyShareTermApp.Controllers
                     .ThenInclude(p => p.Photo)
                 .OrderBy(p => p.Mailer.CreationTime)
                 .ToListAsync());
+        }
+
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

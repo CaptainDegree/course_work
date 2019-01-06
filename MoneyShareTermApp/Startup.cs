@@ -34,7 +34,8 @@ namespace MoneyShareTermApp
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => //CookieAuthenticationOptions
                 {
-                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                    options.LoginPath = new PathString("/Account/Login");
+                    options.AccessDeniedPath = new PathString("/Account/Login");
                 });
 
             // old
@@ -57,7 +58,7 @@ namespace MoneyShareTermApp
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Profile/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -72,7 +73,7 @@ namespace MoneyShareTermApp
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Profile}/{action=Register}/{id?}");
+                    template: "{controller=Profile}/{action=Register}/{id?}"); // TODO поменять на логин
             });
         }
     }

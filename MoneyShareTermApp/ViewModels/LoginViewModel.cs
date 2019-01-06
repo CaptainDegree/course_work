@@ -2,7 +2,7 @@
 
 namespace MoneyShareTermApp.ViewModels
 {
-    public class LoginModel
+    public class LoginViewModel
     {
         [Required(ErrorMessage = "Не указан Email")]
         public string Email { get; set; }
