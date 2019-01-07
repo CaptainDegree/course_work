@@ -34,8 +34,8 @@ namespace MoneyShareTermApp
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => //CookieAuthenticationOptions
                 {
-                    options.LoginPath = new PathString("/Account/Login");
-                    options.AccessDeniedPath = new PathString("/Account/Login");
+                    options.LoginPath = new PathString("/Profile/Login");
+                    options.AccessDeniedPath = new PathString("/Profile/Login");
                 });
 
             // old
@@ -73,7 +73,7 @@ namespace MoneyShareTermApp
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Profile}/{action=Register}/{id?}"); // TODO поменять на логин
+                    template: "{controller=Profile}/{action=Details}/{id?}");
             });
         }
     }

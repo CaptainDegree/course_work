@@ -3,6 +3,6 @@
 <div class="news">
     @foreach(var post in Model)
     {
-        @await Html.PartialAsync("_PostTile", post);
+        @await Html.PartialAsync("_PostTilePartial", post);
     }
 </div>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoneyShareTermApp.Models;
@@ -25,11 +26,11 @@ namespace MoneyShareTermApp.Controllers
         }
 
         // GET: Profile/Details/5
-        [Authorize] // TODO далее распределить по ролям: [Authorize(Roles = "admin, user")]
-        public async Task<IActionResult> Details(int? id)
+        // TODO далее распределить по ролям: [Authorize(Roles = "admin, user")], частично доступно всем (User.FindFirst(ClaimTypes.NameIdentifier).Value)
+        public async Task<IActionResult> Details(int? id)  // TODO можно ли войти на чужую страницу ?
         {
             if (id == null)
-                return NotFound();
+                id = int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
 
             var person = await _context.Person
                 .Include(p => p.Account)
@@ -75,7 +76,7 @@ namespace MoneyShareTermApp.Controllers
                 {
                     await Authenticate(user); // аутентификация
 
-                    return RedirectToAction();
+                    return RedirectToAction("Details", "Profile", user.Id);
                 }
                 ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             }
@@ -119,7 +120,8 @@ namespace MoneyShareTermApp.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Name)
+                new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Name),
+                new Claim(ClaimTypes.PrimarySid, user.Id.ToString())
             };
             // создаем объект ClaimsIdentity
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);

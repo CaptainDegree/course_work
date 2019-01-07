@@ -33,7 +33,7 @@
         <ul>
             @foreach(var post in Model.Post)
             {
-                @await Html.PartialAsync("_PostTile", post)
+                @await Html.PartialAsync("_PostTilePartial", post)
             }
         </ul>
     </div>

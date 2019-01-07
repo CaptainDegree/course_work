@@ -61,7 +61,7 @@ body {
     grid-template-columns: 20% auto;
     grid-template-rows: auto;
     grid-template-areas: "nav content";
-    align-items: start;
+    align-items: flex-start;
     grid-gap: 10px 10px;
 }
 
@@ -114,14 +114,19 @@ ul {
 }
 
 .btn {
-    background-color: #d1d1d1;
-    border-color: #d1d1d1;
+    background-color: #4d4d4d;
+    border-color: #4d4d4d;
 }
 
 .btn:hover {
-    color: black;
+    color: #3a3a3a;
     background-color: darkgray;
     border-color: #d1d1d1;
+}
+
+.btn:active {
+    background-color: black;
+    border-color: black;
 }
 
 .post-list {
@@ -183,4 +188,27 @@ ul {
 /*news page*/
 .news {
     grid-area: content;
+}
+
+/*login and register*/
+.enter {
+    padding: 30px;
+    grid-gap: 20px;
+    display: grid;
+    grid-template-columns: auto 350px auto;
+    grid-template-areas: ". content link";
+}
+
+.enter .login {
+    grid-area: content;
+}
+
+.enter .register {
+    grid-area: content;
+}
+
+.enter .link {
+    grid-area: link;
+    justify-self: start;
+    align-self: flex-start;
 }
