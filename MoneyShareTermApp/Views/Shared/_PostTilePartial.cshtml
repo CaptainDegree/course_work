@@ -2,7 +2,7 @@
 @using System.Text.RegularExpressions
 
 <div class="post card">
-    <div class="author"><img src="~/images/@Model.Person.Photo.Link" /> @Model.Person.SecondName @Model.Person.FirstName</div>
+    <div class="author"><img src="~/images/@(Model.Person.Photo?.Link ?? "anon.jpg")" /> @Model.Person.SecondName @Model.Person.FirstName</div>
     <span class="time">@Model.Mailer.CreationTime</span>
     <div class="text">@Model.Text</div>
     @foreach (var file in Model.File)

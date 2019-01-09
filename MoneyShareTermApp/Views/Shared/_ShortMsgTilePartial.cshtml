@@ -1,0 +1,10 @@
+﻿@model Message
+
+<div class="card profile-tile-cont">
+    <a asp-action="Chat" asp-route-id="@Model.TargetId">
+        <div class="short-msg-tile card-body">
+            <div class="author"><img src="~/images/@(Model.Target.Photo?.Link ?? "anon.jpg")" /> <span>@Model.Target.SecondName @Model.Target.FirstName</span></div>
+            <div class="short-msg">@(Model.PersonId == int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value) ? "Me: " : "") @await Html.PartialAsync("_MsgTilePartial", Model)</div>
+        </div>
+    </a>
+</div>

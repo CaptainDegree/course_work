@@ -43,20 +43,12 @@ html {
 
 body {
     /* Margin bottom by footer height */
-    background-color: #f4f4f6;
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  /* Set the fixed height of the footer here */
-  height: 60px;
-  line-height: 60px; /* Vertically center the text there */
+    /*background-color: #f4f4f6;*/
+    min-height: 100%;
 }
 
 .container {
+    min-height: 100vh;
     display: grid;
     grid-template-columns: 20% auto;
     grid-template-rows: auto;
@@ -111,22 +103,6 @@ ul {
 
 ul {
     padding: 0;
-}
-
-.btn {
-    background-color: #4d4d4d;
-    border-color: #4d4d4d;
-}
-
-.btn:hover {
-    color: #3a3a3a;
-    background-color: darkgray;
-    border-color: #d1d1d1;
-}
-
-.btn:active {
-    background-color: black;
-    border-color: black;
 }
 
 .post-list {
@@ -212,3 +188,123 @@ ul {
     justify-self: start;
     align-self: flex-start;
 }
+
+/*_ShortMsgTilePartial*/
+.short-msg-tile {
+    display: grid;
+    grid-template-areas: "author short-msg";
+}
+
+.short-msg-tile .msg-tile {
+    max-width: 400px;
+}
+
+.short-msg-tile .author {
+    grid-area: author;
+}
+
+.short-msg-tile .short-msg {
+    grid-area: short-msg;
+    text-overflow: clip;
+}
+
+/*_MsgTilePartials*/
+.msg-tile::after {
+    clear: both;
+    content: "";
+    display: table;
+}
+
+.msg-tile-left {
+    float: left;
+    text-align:right;
+    max-width: 700px;
+    min-width: 200px;
+}
+
+.msg-tile-right {
+    float: right;
+    text-align: left;
+    max-width: 700px;
+    min-width: 200px;
+}
+
+/*_PersonTilePartial*/
+.profile-tile-cont {
+    margin-bottom: 15px;
+}
+
+.profile-tile-cont .profile-tile {
+    display: grid;
+    grid-template-areas: "person account";
+}
+
+.profile-tile-cont a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.profile-tile-cont:hover {
+    background-color: #e5e5e5;
+}
+
+.profile-tile-cont img {
+    max-width: 70px;
+    margin-right: 10px;
+}
+
+.profile-tile-cont .profile-tile .acc {
+    align-self: flex-end;
+    justify-self: flex-end;
+    min-width: 150px;
+    text-align: right;
+}
+
+/*Chat*/
+.msg-list .scrollable-window {
+    min-height: 500px;
+    margin-bottom: 5px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.msg-list .scrollable-window #uml {
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    left: 10px;
+}
+
+.msg-list li {
+    margin-bottom: 15px;
+}
+
+/*#curSelect option {
+    display: block;
+    width: 100%;
+    padding: 0.25rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+
+#curSelect option:hover, #curSelect option:focus {
+    color: #16181b;
+    text-decoration: none;
+    background-color: #f8f9fa;
+}
+
+#curSelect option.active, #curSelect option:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #007bff;
+}
+
+#curSelect option.disabled, #curSelect option:disabled {
+    color: #6c757d;
+    background-color: transparent;
+}*/

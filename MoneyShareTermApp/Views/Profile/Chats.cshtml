@@ -1,0 +1,12 @@
+﻿@model IEnumerable<Message>
+
+@{
+    ViewData["Title"] = "Chats";
+}
+
+<div class="chats">
+    @foreach (var m in Model)
+    {
+        @await Html.PartialAsync("_ShortMsgTilePartial", m);
+    }
+</div>

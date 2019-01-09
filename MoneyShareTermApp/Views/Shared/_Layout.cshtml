@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims;
+
+<!DOCTYPE html>
 
 <html>
 <head>
@@ -14,6 +16,26 @@
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
 </head>
 <body>
     <header class="card-header header">
@@ -23,13 +45,16 @@
     </header>
 
     <div class="container">
-        <nav class="navbar">
-            <ul> @{ /*TODO можно сделать ol и добавить картинки (как в вк)*/ }
-                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="Details">профиль</a></li>
-                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="Posts" asp-route-id="@ViewData["PersonId"]">лента</a></li>
-                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="">беседы</a></li>
-                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="">люди</a></li>
-                <li><a class="btn btn-primary" role="button" asp-controller="Profile" asp-action="">настройки</a></li>
+        <nav class="navbar flex-column nav-pills">
+            <ul>
+                @{  /*TODO можно сделать ol и добавить картинки (как в вк)*/
+                    string id = User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value;
+                }
+                <li><a class="nav-link @(ViewData["Title"].Equals("Details") && Context.Request.Query["id"].Equals(int.Parse(id)) ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Details">профиль</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("Posts") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Posts" asp-route-id="@id">лента</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("Chats") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Chats">беседы</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("People") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="People">люди</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("Settings") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="">настройки</a></li>
             </ul>
         </nav>
 
@@ -38,9 +63,9 @@
         </div>
     </div>
 
-    <footer class="card-footer">
+    <footer class="card-footer footer">
         <div>
-            это футер @{ /* TODO добавить выход и вход */ }
+            <a asp-action="Logout">выйти</a>
         </div>
     </footer>
 </body>

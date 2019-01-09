@@ -1,24 +1,30 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoneyShareTermApp.Models;
 using MoneyShareTermApp.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace MoneyShareTermApp.Controllers
+namespace MoneyShareTermApp.Controllers //TODO добавлять посты
 {
     public class ProfileController : Controller
     {
-        private readonly postgresContext _context = new postgresContext();
+        private readonly PostgresContext _context = new PostgresContext();
+
+        public int UserId
+        {
+            get => int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
+        }
 
         // GET: Profile
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var postgresContext = _context.Person.Include(p => p.Account).Include(p => p.CommentPrice).Include(p => p.Mailer).Include(p => p.MessagePrice).Include(p => p.Photo).Include(p => p.SubscriptionPrice);
@@ -27,10 +33,11 @@ namespace MoneyShareTermApp.Controllers
 
         // GET: Profile/Details/5
         // TODO далее распределить по ролям: [Authorize(Roles = "admin, user")], частично доступно всем (User.FindFirst(ClaimTypes.NameIdentifier).Value)
+        [Authorize]
         public async Task<IActionResult> Details(int? id)  // TODO можно ли войти на чужую страницу ?
         {
             if (id == null)
-                id = int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
+                id = UserId;
 
             var person = await _context.Person
                 .Include(p => p.Account)
@@ -254,13 +261,60 @@ namespace MoneyShareTermApp.Controllers
                 .Include(p => p.File)
                 .Include(p => p.Person)
                     .ThenInclude(p => p.Photo)
-                .OrderBy(p => p.Mailer.CreationTime)
+                .OrderByDescending(p => p.Mailer.CreationTime)
                 .ToListAsync());
         }
 
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public async Task<IActionResult> Chats() // TODO отправка денег - тоже сообщение ?, добавить еще в сущность
+        {
+            List<Message> msgs = new List<Message>();
+            int id = UserId;
+
+            await _context.Message
+                .Include(m => m.Mailer)
+                    .ThenInclude(m => m.MoneyTransferTarget)
+                .Include(m => m.Target)
+                    .ThenInclude(t => t.Photo)
+                .Where(m => m.TargetId == UserId || m.PersonId == UserId) // только мои или те, что мне 
+                .GroupBy(m => m.Target)
+                .ForEachAsync(tm => msgs.Add(tm.Select(m => m).Max()));
+
+            return View(msgs);
+        }
+
+        public async Task<IActionResult> Chat(int id) // TODO проверять id
+        {
+            var msgs = _context.Message
+                .Include(m => m.Mailer)
+                    .ThenInclude(m => m.MoneyTransferTarget)
+                .Include(m => m.Person)
+                .Include("Person.Photo")
+                .Include("Person.Account")
+                .Include("Person.Mailer")
+                .Where(m => m.PersonId.Equals(UserId) && m.TargetId.Equals(id))
+                .OrderBy(m => m.Mailer.CreationTime);
+
+            ViewData["TargetId"] = id;
+
+            return View(await msgs.ToListAsync());
+        }
+
+        public async Task<IActionResult> People(string searchString)
+        {
+            var people = _context.Person
+                        .Include(p => p.Photo)
+                        .Include(p => p.Account)
+                        .Select(p => p);
+
+            if (!String.IsNullOrEmpty(searchString))
+                people = people.Where(s => s.Name().Contains(searchString));
+
+            return View(await people.ToListAsync());
         }
     }
 }

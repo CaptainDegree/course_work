@@ -37,4 +37,27 @@ namespace MoneyShareTermApp.Models
         [InverseProperty("SubscriptionPrice")]
         public virtual ICollection<Person> PersonSubscriptionPrice { get; set; }
     }
+
+    public partial class CurrencySet
+    {
+        public Tuple<Char, decimal> GetOne() {
+            if (!(Euro != 0 ^ Ruble != 0 ^ Dollar != 0))
+                throw new ArgumentException();
+
+            if (Euro > 0)
+                return Tuple.Create((char)Currency.Euro, Euro);
+
+            if (Ruble > 0)
+                return Tuple.Create((char)Currency.Ruble, Ruble);
+
+            return Tuple.Create((char)Currency.Dollar, Dollar);
+        }
+    }
+
+    public enum Currency
+    {
+        Euro = '€',
+        Ruble = '₽',
+        Dollar = '$'
+    }
 }

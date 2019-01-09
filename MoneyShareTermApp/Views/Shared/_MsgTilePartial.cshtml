@@ -1,0 +1,21 @@
+﻿@model Message
+
+@{ 
+    bool isFromMe = Model.PersonId.Equals(int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value));
+    /*TODO переделать, автора в другое место, добавить оплату, footer с датой*/
+}
+<div class="msg-tile">
+    <div class="card @(isFromMe ? "msg-tile-right" : "mst-tile-left")">
+        <div class="card-body">
+            @*<div class="author"><img src="~/images/@(Model.Person.Photo?.Link ?? "anon.jpg")" /><span class="author-name">@Model.Person.SecondName @Model.Person.FirstName</span></div>*@
+            <p class="msg card-text">@Model.Text</p>
+            <p class="card-text">
+                <small class="text-muted">
+                    @Model.Mailer.CreationTime.ToUniversalTime() |
+                    @{ var SA = Model.Mailer.MoneyTransferTarget.First().Account.GetOne(); }
+                    @SA.Item1 @SA.Item2
+                </small>
+            </p>
+        </div>
+    </div>
+</div>

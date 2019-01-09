@@ -1,5 +1,8 @@
 ﻿@model IEnumerable<MoneyShareTermApp.Models.Post>
 
+@{
+    ViewData["Title"] = "Posts";
+}
 <div class="news">
     @foreach(var post in Model)
     {

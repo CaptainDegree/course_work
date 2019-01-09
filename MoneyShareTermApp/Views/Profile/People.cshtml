@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Person>
+@{
+    ViewData["Title"] = "People";
+}
+
+<div class="people">
+    <form asp-action="People">
+        <div class="input-group">
+            <input type="text" name="SearchString" class="form-control" placeholder="Имя">
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary">Найти</button>
+            </div>
+        </div>
+    </form>
+
+    <hr />
+
+    @foreach (var p in Model)
+    {
+        @await Html.PartialAsync("_PersonTilePartial", p);
+    }
+</div>
+

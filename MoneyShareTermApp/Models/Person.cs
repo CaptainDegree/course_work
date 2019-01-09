@@ -101,4 +101,9 @@ namespace MoneyShareTermApp.Models
         [InverseProperty("Subscriber")]
         public virtual ICollection<Subscription> SubscriptionSubscriber { get; set; }
     }
+
+    public partial class Person
+    {
+        public string Name() => SecondName + FirstName + MiddleName;        
+    }
 }
