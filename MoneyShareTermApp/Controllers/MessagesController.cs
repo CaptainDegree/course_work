@@ -28,78 +28,37 @@ namespace MoneyShareTermApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Write(int targetId, string msg, Currency cur) //TODO оплата за сообщение
+        public async Task<IActionResult> Write(int targetId, string msg, Currency cur)
         {
-            decimal acc;
-            decimal payment;
-            CurrencySet userAcc = _context.Person
+            CurrencySet payment = new CurrencySet {
+                Euro = 0,
+                Dollar = 0,
+                Ruble = 0
+            };
+
+            Person sender = _context.Person
                 .Include(p => p.Account)
-                .FirstOrDefault(p => p.Id == UserId)
-                .Account;
+                .Include(p => p.Mailer)
+                .SingleOrDefault(p => p.Id == UserId);
 
             Person target = _context.Person
                 .Include(p => p.MessagePrice)
-                .Include(p => p.Account)
-                .FirstOrDefault(p => p.Id == targetId);
+                .Include(p => p.Mailer)
+                .SingleOrDefault(p => p.Id == targetId);
 
             switch (cur)
             {
                 case Currency.Dollar:
-                    acc = userAcc.Dollar;
-                    payment = target.MessagePrice.Dollar;
+                    payment.Dollar = target.MessagePrice.Dollar;
                     break;
                 case Currency.Euro:
-                    acc = userAcc.Euro;
-                    payment = target.MessagePrice.Euro;
+                    payment.Euro = target.MessagePrice.Euro;
                     break;
                 case Currency.Ruble:
-                    acc = userAcc.Ruble;
-                    payment = target.MessagePrice.Ruble;
+                    payment.Ruble = target.MessagePrice.Ruble;
                     break;
                 default:
                     throw new ArgumentException();
-            }
-
-            if (acc < payment)
-                return new JsonResult(false); 
-
-            switch (cur)
-            {
-                case Currency.Dollar:
-                    userAcc.Dollar -= payment;
-                    target.Account.Dollar += payment;
-                    break;
-                case Currency.Euro:
-                    userAcc.Euro -= payment;
-                    target.Account.Euro += payment;
-                    break;
-                case Currency.Ruble:
-                    userAcc.Ruble -= payment;
-                    target.Account.Ruble += payment;
-                    break;
-            }
-
-            // обновление значения счета в бд
-            _context.CurrencySet.Attach(userAcc); 
-            _context.CurrencySet.Attach(target.Account); 
-
-            var entryUser = _context.Entry(userAcc);
-            var entryTarget = _context.Entry(target.Account);
-
-            switch (cur)
-            {
-                case Currency.Dollar:
-                    entryUser.Property(e => e.Dollar).IsModified = true;
-                    entryTarget.Property(e => e.Dollar).IsModified = true;
-                    break;
-                case Currency.Euro:
-                    entryUser.Property(e => e.Euro).IsModified = true;
-                    entryTarget.Property(e => e.Euro).IsModified = true;
-                    break;
-                case Currency.Ruble:
-                    entryUser.Property(e => e.Ruble).IsModified = true;
-                    entryTarget.Property(e => e.Ruble).IsModified = true;
-                    break;
             }
 
             var m = new Message {
@@ -112,7 +71,37 @@ namespace MoneyShareTermApp.Controllers
             _context.Add(m);
             await _context.SaveChangesAsync();
 
+            try
+            {
+                MoneyTransfer.TransMoney(sender, m.Mailer, payment, TransferType.Message, _context);
+            } catch
+            {
+                _context.Remove(m);
+                await _context.SaveChangesAsync();
+                return new JsonResult(false);
+            }
+
             return PartialView("_MsgTilePartial", m);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendMsgs(int targetId, int msgId)
+        {
+            var msgs = _context.Message
+                .Include(m => m.Mailer)
+                    .ThenInclude(m => m.MoneyTransferTarget)
+                .Include(m => m.Person)
+                .Include("Person.Photo")
+                .Include("Person.Account")
+                .Include("Person.Mailer")
+                .Where(m => m.PersonId.Equals(UserId) && m.TargetId.Equals(targetId) && m.Id > msgId)
+                .OrderBy(m => m.Mailer.CreationTime);
+
+            if (msgs.Any())
+                return PartialView("_MsgTilePartial", msgs.First());
+
+            return new JsonResult(false);
         }
 
         //// GET: Messages

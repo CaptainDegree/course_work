@@ -7,6 +7,7 @@
 <div class="msg-tile">
     <div class="card @(isFromMe ? "msg-tile-right" : "mst-tile-left")">
         <div class="card-body">
+            <input type="hidden" class="msgId" value="@Model.Id">
             @*<div class="author"><img src="~/images/@(Model.Person.Photo?.Link ?? "anon.jpg")" /><span class="author-name">@Model.Person.SecondName @Model.Person.FirstName</span></div>*@
             <p class="msg card-text">@Model.Text</p>
             <p class="card-text">

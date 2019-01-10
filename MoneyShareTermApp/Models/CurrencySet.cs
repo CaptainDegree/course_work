@@ -41,8 +41,8 @@ namespace MoneyShareTermApp.Models
     public partial class CurrencySet
     {
         public Tuple<Char, decimal> GetOne() {
-            if (!(Euro != 0 ^ Ruble != 0 ^ Dollar != 0))
-                throw new ArgumentException();
+            if (!((Euro != 0 ^ Ruble != 0 ^ Dollar != 0) && !(Euro == 0 && Dollar == 0 && Ruble == 0)))
+                throw new ArgumentException(); // только один из них должен быть равен 0
 
             if (Euro > 0)
                 return Tuple.Create((char)Currency.Euro, Euro);
@@ -51,6 +51,33 @@ namespace MoneyShareTermApp.Models
                 return Tuple.Create((char)Currency.Ruble, Ruble);
 
             return Tuple.Create((char)Currency.Dollar, Dollar);
+        }
+
+        public bool CheckPositive()
+        {
+            return Euro >= 0 && Ruble >= 0 && Dollar >= 0;
+        }
+
+        public void Plus(CurrencySet other)
+        {
+            Euro += other.Euro;
+            Ruble += other.Ruble;
+            Dollar += other.Dollar;
+        }
+
+        public bool Minus(CurrencySet other)
+        {
+            Euro -= other.Euro;
+            Ruble -= other.Ruble;
+            Dollar -= other.Dollar;
+
+            if (!CheckPositive())
+            {
+                Plus(other);
+                return false;
+            }
+
+            return true;
         }
     }
 

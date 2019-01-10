@@ -2,14 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MoneyShareTermApp.Models
 {
-    public class PersonModelBinder : IModelBinder
+    public class PersonSettingsBinder : IModelBinder
     {
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
@@ -17,12 +16,6 @@ namespace MoneyShareTermApp.Models
 
             var person = new Person
             {
-                Account = new CurrencySet()
-                {
-                    Euro = 0,
-                    Ruble = 0,
-                    Dollar = 0
-                },
                 CommentPrice = new CurrencySet()
                 {
                     Euro = decimal.Parse(getFromForm("CommentPrice.Euro")),
@@ -41,7 +34,6 @@ namespace MoneyShareTermApp.Models
                     Ruble = decimal.Parse(getFromForm("SubscriptionPrice.Ruble")),
                     Dollar = decimal.Parse(getFromForm("SubscriptionPrice.Dollar"))
                 },
-                Mailer = new MoneyMailer()
             };
 
             var props = typeof(Person).GetProperties();
@@ -52,6 +44,9 @@ namespace MoneyShareTermApp.Models
                     var val = getFromForm(prop.Name);
                     prop.SetValue(person, DateTime.TryParse(val, out DateTime res) ? (object)res : (object)val);
                 }
+
+            person.Hidden = bool.Parse(getFromForm("Hidden"));
+            person.Id = int.Parse(getFromForm("Id"));
 
             bindingContext.Result = ModelBindingResult.Success(person);
 

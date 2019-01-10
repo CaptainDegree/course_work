@@ -66,7 +66,7 @@ namespace MoneyShareTermApp.Models
         [Column("email")]
         public string Email { get; set; }
         [Column("hidden")]
-        public bool? Hidden { get; set; }
+        public bool Hidden { get; set; }
 
         [ForeignKey("AccountId")]
         [InverseProperty("PersonAccount")]

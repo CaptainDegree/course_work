@@ -229,6 +229,14 @@ ul {
     min-width: 200px;
 }
 
+.msg-tile .card-text {
+    margin-bottom: 0;
+}
+
+msg-tile .text-muted {
+    font-size: 3px;
+}
+
 /*_PersonTilePartial*/
 .profile-tile-cont {
     margin-bottom: 15px;
@@ -262,14 +270,14 @@ ul {
 
 /*Chat*/
 .msg-list .scrollable-window {
-    min-height: 500px;
+    height: 600px;
     margin-bottom: 5px;
-    overflow-y: auto;
+    overflow-y: scroll;
     position: relative;
 }
 
 .msg-list .scrollable-window #uml {
-    position: absolute;
+    /*position: absolute;*/
     bottom: 0;
     right: 10px;
     left: 10px;

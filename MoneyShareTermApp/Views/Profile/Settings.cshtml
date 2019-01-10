@@ -1,0 +1,122 @@
+﻿@model Person
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div>
+    <form asp-action="Update" asp-antiforgery="true">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label>Comment Price in</label><br />
+
+            <label asp-for="CommentPrice.Euro" class="control-label"></label>
+            <input value="@Model.CommentPrice.Euro" asp-for="CommentPrice.Euro" class="form-control" />
+            <span asp-validation-for="CommentPrice.Euro" class="text-danger"></span>
+
+            <label asp-for="CommentPrice.Ruble" class="control-label"></label>
+            <input value="@Model.CommentPrice.Ruble" asp-for="CommentPrice.Ruble" class="form-control" />
+            <span asp-validation-for="CommentPrice.Ruble" class="text-danger"></span>
+
+            <label asp-for="CommentPrice.Dollar" class="control-label"></label>
+            <input value="@Model.CommentPrice.Dollar" asp-for="CommentPrice.Dollar" class="form-control" />
+            <span asp-validation-for="CommentPrice.Dollar" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>Message Price in</label><br />
+
+            <label asp-for="MessagePrice.Euro" class="control-label"></label>
+            <input value="@Model.MessagePrice.Euro" asp-for="MessagePrice.Euro" class="form-control" />
+            <span asp-validation-for="MessagePrice.Euro" class="text-danger"></span>
+
+            <label asp-for="MessagePrice.Ruble" class="control-label"></label>
+            <input value="@Model.MessagePrice.Ruble" asp-for="MessagePrice.Ruble" class="form-control" />
+            <span asp-validation-for="MessagePrice.Ruble" class="text-danger"></span>
+
+            <label asp-for="MessagePrice.Dollar" class="control-label"></label>
+            <input value="@Model.MessagePrice.Dollar" asp-for="MessagePrice.Dollar" class="form-control" />
+            <span asp-validation-for="MessagePrice.Dollar" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>Subscription Price in</label><br />
+
+            <label asp-for="SubscriptionPrice.Euro" class="control-label"></label>
+            <input value="@Model.SubscriptionPrice.Euro" asp-for="SubscriptionPrice.Euro" class="form-control" />
+            <span asp-validation-for="SubscriptionPrice.Euro" class="text-danger"></span>
+
+            <label asp-for="SubscriptionPrice.Ruble" class="control-label"></label>
+            <input value="@Model.SubscriptionPrice.Ruble" asp-for="SubscriptionPrice.Ruble" class="form-control" />
+            <span asp-validation-for="SubscriptionPrice.Ruble" class="text-danger"></span>
+
+            <label asp-for="SubscriptionPrice.Dollar" class="control-label"></label>
+            <input value="@Model.SubscriptionPrice.Dollar" asp-for="SubscriptionPrice.Dollar" class="form-control" />
+            <span asp-validation-for="SubscriptionPrice.Dollar" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Birthday" class="control-label"></label>
+            <input value="@Model.Birthday.ToString("yyyy-MM-dd")" asp-for="Birthday" type="date" class="form-control" />
+            <span asp-validation-for="Birthday" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FirstName" class="control-label">First name</label>
+            <input value="@Model.FirstName" asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="MiddleName" class="control-label">Middle name</label>
+            <input value="@Model.MiddleName" asp-for="MiddleName" class="form-control" />
+            <span asp-validation-for="MiddleName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SecondName" class="control-label" Second name></label>
+            <input value="@Model.SecondName" asp-for="SecondName" class="form-control" />
+            <span asp-validation-for="SecondName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Login" class="control-label">Login</label>
+            <input value="@Model.Login" asp-for="Login" class="form-control" />
+            <span asp-validation-for="Login" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password" class="control-label">Password</label>
+            <input value="@Model.Password" asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password" class="control-label">Confirm password</label>
+            <input value="@Model.Password" asp-for="ConfirmPassword" type="password" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="PhoneNumber" class="control-label">Phone number</label>
+            <input value="@Model.PhoneNumber" asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email" class="control-label"></label>
+            <input value="@Model.Email" asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-check">
+            <input value="@Model.Hidden" asp-for="Hidden" class="form-check-input" type="checkbox">
+            <label asp-for="Hidden" class="form-check-label">
+                Is hidden
+            </label>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Сохранить" class="btn btn-primary" />
+        </div>
+        <div>
+            <input type="hidden" value="@Model.Id" asp-for="Id" />
+        </div>
+    </form>
+    <form asp-action="Upload" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>
+                File input
+                <input type="file" class="form-control-file" name="uploadedFile" style="margin-bottom: 15px">
+                <input type="submit" value="Загрузить" class="btn btn-primary" />
+            </label>
+        </div>
+    </form>
+</div>

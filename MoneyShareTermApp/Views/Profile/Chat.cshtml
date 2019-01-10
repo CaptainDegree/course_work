@@ -3,10 +3,11 @@
     ViewData["Title"] = "Chat";
 }
 
-<div class="msg-list"> @{ /*TODO отображать стоимость*/ }
+<div class="msg-list">
+    @{ /*TODO отображать стоимость*/ }
     <div id="msg-scrollable-window" class="scrollable-window">
         <ul id="uml">
-            @foreach(var m in Model)
+            @foreach (var m in Model)
             {
                 <li>
                     @await Html.PartialAsync("_MsgTilePartial", m)
@@ -14,14 +15,10 @@
             }
         </ul>
     </div>
-    <script>
-        var scroll = $('#msg-scrollable-window');
-        scroll.scrollTop = scroll.scrollHeight;
-    </script>
     <form method="post">
-        <input id="targetId" name="targetId" type="hidden" class="form-control" value="@ViewData["TargetId"]"/>
+        <input id="targetId" name="targetId" type="hidden" class="form-control" value="@ViewData["TargetId"]" />
         <div class="input-group">
-            <input id="msg" name="msg" type="text" class="form-control" placeholder="сообщение"/>
+            <input id="msg" name="msg" type="text" class="form-control" placeholder="сообщение" />
             <div class="input-group-append">
                 <select class="btn btn-outline-secondary" id="curSelect" asp-items="Html.GetEnumSelectList<Currency>()"></select> @{ /*TODO можно поменять названия на знаки*/ }
                 <input type="button" id="button" name="button" class="btn btn-outline-secondary" value="отправить" />
@@ -29,33 +26,6 @@
         </div>
     </form>
 
-    <script> //TODO входящие сообщения, изменять счет
-        $(document).ready(function () {
-            $('#button').click(function () {
-                var targetId = $('#targetId').val();
-                var msg = $('#msg').val();
-                var cur = $('#curSelect').val();
-
-                if (msg !== "")
-                    $.ajax({
-                        type: 'POST',
-                        url: '/Messages/Write',
-                        data: { targetId: targetId, msg: msg, cur: cur },
-                        headers: {
-                            RequestVerificationToken:
-                                $('input:hidden[name="__RequestVerificationToken"]').val()
-                        },
-                        success: function (res) {
-                            if (res === false)
-                                alert("нет средств!");
-                            else {
-                                var li = '<li>' + res + '</li>';
-                                $('#uml').append(li);
-                            }
-                        }
-                    })
-            });
-        })
-    </script>
+    <script src="~/js/site.js" asp-append-version="true">//TODO входящие сообщения, изменять счет</script>
 </div>
 

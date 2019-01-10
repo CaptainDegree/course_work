@@ -34,7 +34,6 @@
                 crossorigin="anonymous"
                 integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
         </script>
-        <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
 </head>
 <body>
@@ -52,9 +51,9 @@
                 }
                 <li><a class="nav-link @(ViewData["Title"].Equals("Details") && Context.Request.Query["id"].Equals(int.Parse(id)) ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Details">профиль</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("Posts") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Posts" asp-route-id="@id">лента</a></li>
-                <li><a class="nav-link @(ViewData["Title"].Equals("Chats") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Chats">беседы</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("Chats") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Chats" asp-route-id="@id">беседы</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("People") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="People">люди</a></li>
-                <li><a class="nav-link @(ViewData["Title"].Equals("Settings") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="">настройки</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("Settings") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Settings" asp-route-id="@id">настройки</a></li>
             </ul>
         </nav>
 
