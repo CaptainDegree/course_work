@@ -53,6 +53,11 @@ namespace MoneyShareTermApp.Models
             return Tuple.Create((char)Currency.Dollar, Dollar);
         }
 
+        public string GetAll()
+        {
+            return Euro.ToString() + "€ " + Ruble.ToString() + "р " + Dollar.ToString() + "$ ";
+        }
+
         public bool CheckPositive()
         {
             return Euro >= 0 && Ruble >= 0 && Dollar >= 0;
@@ -84,7 +89,7 @@ namespace MoneyShareTermApp.Models
     public enum Currency
     {
         Euro = '€',
-        Ruble = '₽',
+        Ruble = 'р',
         Dollar = '$'
     }
 }

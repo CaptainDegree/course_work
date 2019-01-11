@@ -31,8 +31,12 @@ namespace MoneyShareTermApp.Models
         public virtual Person Target { get; set; }
     }
 
-    public partial class Message
+    public partial class Message : IComparable<Message>
     {
+        public static readonly string MsgTransfer = "Перевод: ";
+        public static readonly string SubTransfer = "Оплата подписки: ";
+        public static readonly string LikeTransfer = "Пост оценили: ";
+
         public int CompareTo(Message other)
         {
             if (other == null)

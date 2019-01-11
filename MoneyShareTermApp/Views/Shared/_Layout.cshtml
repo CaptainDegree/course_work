@@ -1,6 +1,9 @@
-﻿@using System.Security.Claims;
+﻿<!DOCTYPE html>
 
-<!DOCTYPE html>
+@{
+    string id = User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value;
+    string role = User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.Role).Value;
+}
 
 <html>
 <head>
@@ -19,11 +22,9 @@
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">
         <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
-                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
                 asp-fallback-test="window.jQuery"
                 crossorigin="anonymous"
                 integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
@@ -39,17 +40,24 @@
 <body>
     <header class="card-header header">
         <div>
-            Это хэдер
+            @{ 
+                string linkCur = "https://www.cbr-xml-daily.ru/daily_json.js";
+                var httpClient = new HttpClient();
+                var content = await httpClient.GetStringAsync(linkCur);
+                var json = JObject.Parse(content);
+
+                decimal Dollar = (decimal)json["Valute"]["USD"]["Value"];
+                decimal Euro = (decimal)json["Valute"]["EUR"]["Value"];
+            }
+            <span style="margin-right: 50px">@("доллар к рублю: " + Dollar)</span>
+            <span>@("евро к рублю: " + Euro)</span>            
         </div>
     </header>
 
     <div class="container">
         <nav class="navbar flex-column nav-pills">
             <ul>
-                @{  /*TODO можно сделать ol и добавить картинки (как в вк)*/
-                    string id = User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value;
-                }
-                <li><a class="nav-link @(ViewData["Title"].Equals("Details") && Context.Request.Query["id"].Equals(int.Parse(id)) ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Details">профиль</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("Details") && Context.Request.Path.ToString().EndsWith(id) ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Details" asp-route-id="@id">профиль</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("Posts") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Posts" asp-route-id="@id">лента</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("Chats") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Chats" asp-route-id="@id">беседы</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("People") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="People">люди</a></li>
@@ -64,7 +72,11 @@
 
     <footer class="card-footer footer">
         <div>
-            <a asp-action="Logout">выйти</a>
+            <a asp-action="Logout" style="margin-right: 50px">выйти</a>
+            @if (role == "admin")
+            {
+                <a asp-action="Index">пользователи</a>
+            }
         </div>
     </footer>
 </body>

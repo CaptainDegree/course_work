@@ -1,22 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MoneyShareTermApp.Models;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using MoneyShareTermApp.Models;
 
 namespace MoneyShareTermApp.Controllers
 {
+    [Authorize]
     public class PostsController : Controller
     {
         private readonly PostgresContext _context;
+        private IHostingEnvironment _appEnvironment;
 
-        public PostsController(PostgresContext context)
+        public PostsController(PostgresContext context, IHostingEnvironment appEnvironment)
         {
             _context = context;
+            _appEnvironment = appEnvironment;
         }
 
         public int UserId
@@ -24,112 +28,56 @@ namespace MoneyShareTermApp.Controllers
             get => int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
         }
 
-        // GET: Posts
-        public async Task<IActionResult> Index()
-        {
-            var postgresContext = _context.Post.Include(p => p.Mailer).Include(p => p.Person).Include(p => p.PostNavigation);
-            return View(await postgresContext.ToListAsync());
-        }
-
-        // GET: Posts/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var post = await _context.Post
-        //        .Include(p => p.Mailer)
-        //        .Include(p => p.Person)
-        //        .Include(p => p.PostNavigation)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (post == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(post);
-        //}
-
-        // GET: Posts/Create
-
-        // POST: Posts/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PersonId,PostId,MailerId,Text")] Post post)
+        public async Task<IActionResult> Create([Bind("Text")] Post post, IFormFile uploadedFile)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && uploadedFile != null)
             {
+                // добавляю файл
+                string path = "/images/" + uploadedFile.FileName;
+                // сохраняем файл в папку Files в каталоге wwwroot
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                {
+                    await uploadedFile.CopyToAsync(fileStream);
+                }
+
+                post.File.Add(new Models.File
+                {
+                    Link = uploadedFile.FileName
+                });
+                post.Person = _context.Person
+                    .Include(p => p.SubscriptionPrice)
+                    .FirstOrDefault(p => p.Id == UserId);                
+
                 _context.Add(post);
+
+                // оплата подписчиков // TODO проверить, ловить ошибку
+                foreach (var sub in _context.Subscription.Include(s => s.Person).Include(s => s.Subscriber).Where(s => s.PersonId == UserId))
+                {
+                    MoneyTransfer.TransMoney(sub.Subscriber, sub.Person, sub.Person.SubscriptionPrice, TransferType.Subscription, _context);
+
+                    var m = new Message
+                    {
+                        PersonId = sub.Subscriber.Id,
+                        TargetId = sub.Person.Id,
+                        Mailer = new MoneyMailer(),
+                        Text = Message.SubTransfer + sub.Person.SubscriptionPrice.GetAll()
+                    };
+
+                    _context.Add(m); 
+                    _context.SaveChanges();
+                }
+                    
+
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
 
-            return View(post);
-        }
-
-        // GET: Posts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var post = await _context.Post.FindAsync(id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-            ViewData["MailerId"] = new SelectList(_context.MoneyMailer, "Id", "Id", post.MailerId);
-            ViewData["PersonId"] = new SelectList(_context.Person, "Id", "Email", post.PersonId);
-            ViewData["PostId"] = new SelectList(_context.Post, "Id", "Id", post.PostId);
-            return View(post);
-        }
-
-        // POST: Posts/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PersonId,PostId,MailerId,Text")] Post post)
-        {
-            if (id != post.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PostExists(post.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["MailerId"] = new SelectList(_context.MoneyMailer, "Id", "Id", post.MailerId);
-            ViewData["PersonId"] = new SelectList(_context.Person, "Id", "Email", post.PersonId);
-            ViewData["PostId"] = new SelectList(_context.Post, "Id", "Id", post.PostId);
-            return View(post);
+            return RedirectToAction("Details", "Profile");
         }
 
         // GET: Posts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id) // TODO сделать 
         {
             if (id == null)
             {
@@ -149,20 +97,35 @@ namespace MoneyShareTermApp.Controllers
             return View(post);
         }
 
-        // POST: Posts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult Like(CurrencySet like, int postId)
         {
-            var post = await _context.Post.FindAsync(id);
-            _context.Post.Remove(post);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            if (like.CheckPositive())
+            {
+                // отправка денег
+                Person sender = _context.Person
+                    .Include(p => p.Mailer)
+                    .FirstOrDefault(p => p.Id == UserId);
+                Post postTarget = _context.Post
+                    .Include(p => p.Mailer)
+                    .Include(p => p.Person)
+                    .FirstOrDefault(p => p.Id == postId);
 
-        private bool PostExists(int id)
-        {
-            return _context.Post.Any(e => e.Id == id);
+                MoneyTransfer.TransMoney(sender, postTarget.Mailer, like, TransferType.Like, _context);
+
+                // отправка сообщения 
+                var m = new Message
+                {
+                    PersonId = sender.Id,
+                    TargetId = postTarget.Person.Id,
+                    Mailer = new MoneyMailer(),
+                    Text = Message.LikeTransfer + like.GetAll() + " Id поста: " + postId
+                };
+
+                _context.Add(m);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Details", "Profile");
         }
     }
 }

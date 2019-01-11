@@ -28,14 +28,8 @@ namespace MoneyShareTermApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Write(int targetId, string msg, Currency cur)
+        public async Task<IActionResult> Write(int targetId, string msg, Currency cur, MsgType type)
         {
-            CurrencySet payment = new CurrencySet {
-                Euro = 0,
-                Dollar = 0,
-                Ruble = 0
-            };
-
             Person sender = _context.Person
                 .Include(p => p.Account)
                 .Include(p => p.Mailer)
@@ -46,34 +40,87 @@ namespace MoneyShareTermApp.Controllers
                 .Include(p => p.Mailer)
                 .SingleOrDefault(p => p.Id == targetId);
 
-            switch (cur)
+            CurrencySet payment = new CurrencySet // плата
             {
-                case Currency.Dollar:
-                    payment.Dollar = target.MessagePrice.Dollar;
-                    break;
-                case Currency.Euro:
-                    payment.Euro = target.MessagePrice.Euro;
-                    break;
-                case Currency.Ruble:
-                    payment.Ruble = target.MessagePrice.Ruble;
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
-
-            var m = new Message {
-                PersonId = UserId,
-                TargetId = targetId,
-                Mailer = new MoneyMailer(),
-                Text = msg
+                Euro = 0,
+                Dollar = 0,
+                Ruble = 0
             };
 
-            _context.Add(m);
-            await _context.SaveChangesAsync();
+            Message m; // или сообщение пользователя, или о переводе
+
+            if (type == MsgType.Message) // если - сообщение, то отправить 
+            {
+                int charAmount = msg.Length; // оплата за знаки
+                switch (cur)
+                {
+                    case Currency.Dollar:
+                        payment.Dollar = target.MessagePrice.Dollar * charAmount;
+                        break;
+                    case Currency.Euro:
+                        payment.Euro = target.MessagePrice.Euro * charAmount;
+                        break;
+                    case Currency.Ruble:
+                        payment.Ruble = target.MessagePrice.Ruble * charAmount;
+                        break;
+                    default:
+                        throw new ArgumentException();
+                }
+
+                m = new Message
+                {
+                    PersonId = UserId,
+                    TargetId = targetId,
+                    Mailer = new MoneyMailer(),
+                    Text = msg
+                };
+            } else // если просто перевод 
+            {
+                decimal val = decimal.Parse(msg);
+
+                if (val == 0)
+                    return new JsonResult(false);
+
+                switch (cur)
+                {
+                    case Currency.Dollar:
+                        payment.Dollar = val;
+                        break;
+                    case Currency.Euro:
+                        payment.Euro = val;
+                        break;
+                    case Currency.Ruble:
+                        payment.Ruble = val;
+                        break;
+                    default:
+                        throw new ArgumentException();
+                }
+
+                m = new Message
+                {
+                    PersonId = UserId,
+                    TargetId = targetId,
+                    Mailer = new MoneyMailer(),
+                    Text = Message.MsgTransfer + payment.GetOne().Item2 + payment.GetOne().Item1
+                };
+            }
+
+            _context.Add(m); // добавим сообщение, чтобы сослаться на него при отправке
+            _context.SaveChanges();
 
             try
             {
-                MoneyTransfer.TransMoney(sender, m.Mailer, payment, TransferType.Message, _context);
+                switch (type)
+                {
+                    case MsgType.Message:
+                        MoneyTransfer.TransMoney(sender, m.Mailer, payment, TransferType.Message, _context);
+                        break;
+                    case MsgType.Money:
+                        MoneyTransfer.TransMoney(sender, m.Mailer, payment, TransferType.Trans, _context);
+                        break;
+                    default:
+                        throw new ArgumentException();
+                }
             } catch
             {
                 _context.Remove(m);
@@ -97,6 +144,10 @@ namespace MoneyShareTermApp.Controllers
                 .Include("Person.Mailer")
                 .Where(m => m.PersonId.Equals(UserId) && m.TargetId.Equals(targetId) && m.Id > msgId)
                 .OrderBy(m => m.Mailer.CreationTime);
+
+            foreach (var m in msgs)
+                foreach (var mtt in m.Mailer.MoneyTransferTarget)
+                    mtt.Account = _context.CurrencySet.FirstOrDefault(cs => cs.Id == mtt.AccountId);
 
             if (msgs.Any())
                 return PartialView("_MsgTilePartial", msgs.First());

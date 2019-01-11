@@ -5,6 +5,16 @@
 
 <div class="msg-list">
     @{ /*TODO отображать стоимость*/ }
+
+    <div>
+        <label>
+            стоимость символа: 
+            @(((CurrencySet)ViewData["MsgPrice"]).GetAll())
+        </label>
+        <div>
+            @await  Html.PartialAsync("_PersonTilePartial", (Person)ViewData["Person"])
+        </div>
+    </div>
     <div id="msg-scrollable-window" class="scrollable-window">
         <ul id="uml">
             @foreach (var m in Model)
@@ -20,12 +30,13 @@
         <div class="input-group">
             <input id="msg" name="msg" type="text" class="form-control" placeholder="сообщение" />
             <div class="input-group-append">
+                <select class="btn btn-outline-secondary" id="typeSelect" asp-items="Html.GetEnumSelectList<MsgType>()"></select>
                 <select class="btn btn-outline-secondary" id="curSelect" asp-items="Html.GetEnumSelectList<Currency>()"></select> @{ /*TODO можно поменять названия на знаки*/ }
                 <input type="button" id="button" name="button" class="btn btn-outline-secondary" value="отправить" />
             </div>
         </div>
     </form>
 
-    <script src="~/js/site.js" asp-append-version="true">//TODO входящие сообщения, изменять счет</script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 </div>
 

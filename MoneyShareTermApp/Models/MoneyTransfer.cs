@@ -47,7 +47,7 @@ namespace MoneyShareTermApp.Models
                 Type = (int)type
             };
 
-            // получить получателей, чтобы изменить аккаунты 
+            // получить отправлятелей, чтобы изменить аккаунты 
             var perSender = _context.Person
                 .Include(p => p.Account)
                 .SingleOrDefault(p => p.MailerId == sender.Id);
@@ -116,7 +116,7 @@ namespace MoneyShareTermApp.Models
             TransMoney(sender.Mailer, target, acc, type, _context);
         }
 
-        public static void TransMoneyAsync(Person sender, Person target, CurrencySet acc, TransferType type, PostgresContext _context)
+        public static void TransMoney(Person sender, Person target, CurrencySet acc, TransferType type, PostgresContext _context)
         {
             TransMoney(sender.Mailer, target.Mailer, acc, type, _context);
         }
@@ -129,5 +129,11 @@ namespace MoneyShareTermApp.Models
         Like,
         Comment,
         Trans
+    }
+
+    public enum MsgType
+    {
+        Message,
+        Money
     }
 }

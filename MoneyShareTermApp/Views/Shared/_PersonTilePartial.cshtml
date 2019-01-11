@@ -5,9 +5,9 @@
         <div class="profile-tile card-body">
             <div class="author"><img src="~/images/@(Model.Photo?.Link ?? "anon.jpg")" /><span>@Model.SecondName @Model.FirstName</span></div>
             <div class="acc">
-                <span class="currency">$ @Model.Account.Dollar</span>
-                <span class="currency">€ @Model.Account.Euro</span>
-                <span class="currency">₽ @Model.Account.Ruble</span>
+                <span class="currency" id="Dollar">$ @Model.Account.Dollar</span>
+                <span class="currency" id="Euro">€ @Model.Account.Euro</span>
+                <span class="currency" id="Ruble">₽ @Model.Account.Ruble</span>
             </div>
         </div>
     </a>

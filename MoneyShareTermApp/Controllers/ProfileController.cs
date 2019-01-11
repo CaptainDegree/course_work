@@ -15,7 +15,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 
-namespace MoneyShareTermApp.Controllers //TODO добавлять посты
+namespace MoneyShareTermApp.Controllers
 {
     public class ProfileController : Controller
     {
@@ -42,28 +42,31 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
         }
 
         // GET: Profile/Details/5
-        // TODO далее распределить по ролям: [Authorize(Roles = "admin, user")], частично доступно всем (User.FindFirst(ClaimTypes.NameIdentifier).Value)
         [Authorize]
-        public async Task<IActionResult> Details(int? id)  // TODO можно ли войти на чужую страницу ?
+        public async Task<IActionResult> Details(int? id) 
         {
             if (id == null)
                 id = UserId;
-
+            
             var person = await _context.Person
                 .Include(p => p.Account)
                 .Include(p => p.Photo)
                 .Include(p => p.Post)
                 .Include("Post.Mailer")
                 .Include("Post.Mailer.MoneyTransferTarget")
+                .Include("Post.Mailer.MoneyTransferTarget.Account")
                 .Include("Post.File")
                 .Include(p => p.SubscriptionPerson)
                 .Include(p => p.SubscriptionSubscriber)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
+            person.Post = person.Post.OrderByDescending(p => p.Mailer.CreationTime).ToList();
+
             if (person == null)
                 return NotFound();
 
             ViewData["PersonId"] = person.Id;
+            ViewData["PersonAcc"] = person.Account.GetAll();
 
             return View(person);
         }
@@ -93,7 +96,7 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
                 {
                     await Authenticate(user); // аутентификация
 
-                    return RedirectToAction("Details", "Profile", user.Id);
+                    return RedirectToAction("Details", "Profile", new { user.Id });
                 }
                 ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             }
@@ -122,7 +125,7 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
 
                     await Authenticate(person); // аутентификация
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Details", new { UserId }); // TODO проверить 
                 }
                 else
                     ModelState.AddModelError("", "Некорректные логин и(или) пароль");
@@ -241,7 +244,7 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
             if (id == null)
                 return NotFound();
 
-            return View(await _context.Post
+            var posts = await _context.Post
                 .Where(p => p.PersonId == id ||
                 p.Person.SubscriptionSubscriber.Any(s => s.Id == id))
                 .Include(p => p.Mailer)
@@ -250,7 +253,13 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
                 .Include(p => p.Person)
                     .ThenInclude(p => p.Photo)
                 .OrderByDescending(p => p.Mailer.CreationTime)
-                .ToListAsync());
+                .ToListAsync();
+
+            foreach (var p in posts)
+                foreach (var mtt in p.Mailer.MoneyTransferTarget)
+                    mtt.Account = _context.CurrencySet.FirstOrDefault(cs => cs.Id == mtt.AccountId);
+
+            return View(posts);
         }
 
         public IActionResult Error()
@@ -298,6 +307,16 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
                     mtt.Account = _context.CurrencySet.FirstOrDefault(cs => cs.Id == mtt.AccountId);
 
             ViewData["TargetId"] = id;
+            ViewData["MsgPrice"] = _context
+                .Person
+                .Include(p => p.MessagePrice)
+                .FirstOrDefault(p => p.Id == id)
+                .MessagePrice;
+            ViewData["Person"] = _context
+                .Person
+                .Include(p => p.Photo)
+                .Include(p => p.Account)
+                .FirstOrDefault(p => p.Id == id);
 
             return View(await msgs.ToListAsync());
         }
@@ -337,7 +356,7 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update([ModelBinder(BinderType = typeof(PersonSettingsBinder))] Person updPerson, IFormFile uploadedFile)
+        public async Task<IActionResult> Update([ModelBinder(BinderType = typeof(PersonSettingsBinder))] Person updPerson)
         {
             if (UserId != updPerson.Id)
                 return NotFound();
@@ -347,9 +366,9 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
                 _context.Update(updPerson);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Details");
+                return RedirectToAction("Details", new { UserId });
             }
-            return RedirectToAction("Setting", UserId);
+            return RedirectToAction("Setting", new { UserId });
         }
 
         [HttpPost]
@@ -378,6 +397,33 @@ namespace MoneyShareTermApp.Controllers //TODO добавлять посты
             }
 
             return RedirectToAction("Setting", UserId);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Subscribe(int id) // TODO сообщить об этом 
+        {
+            Subscription sub = new Subscription
+            {
+                SubscriberId = UserId,
+                PersonId = id,
+                Mailer = new MoneyMailer()
+            };
+
+            _context.Add(sub);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id });
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Unsubscribe(int id)
+        {
+            Subscription sub = _context.Subscription.FirstOrDefault(s => s.SubscriberId == UserId && s.PersonId == id);
+
+            _context.Subscription.Remove(sub);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id });
         }
     }
 }

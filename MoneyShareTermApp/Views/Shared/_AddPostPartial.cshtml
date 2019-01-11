@@ -1,18 +1,20 @@
-﻿<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+﻿
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="padding: 10px">
             <form asp-action="Create" asp-controller="Posts" enctype="multipart/form-data">
                 <div class="form-group">
                     <input class="form-control" type="text" name="text" style="margin-bottom: 10px" placeholder="текст" />
                     <div class="custom-file">
-                        <input class="custom-file-input" type="file" name="file" />
+                        <input class="custom-file-input" type="file" name="uploadedFile" />
                         <label class="custom-file-label" for="inputGroupFile01">картинка</label>
                     </div>
                 </div>
 
                 <div class="modal-footer form-group">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">закрыть</button>
-                    <button type="button" class="btn btn-primary">сохранить</button>
+                    <input type="button" class="btn btn-secondary" data-dismiss="modal" value="закрыть"/>
+                    <input type="submit" class="btn btn-primary" value="сохранить"/>
                 </div>
             </form>
         </div>

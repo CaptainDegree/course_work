@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Details";
+    int UserId = int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
 }
 
 <div class="details">
@@ -20,7 +21,16 @@
         <hr />
         @*@if (!Model.Id.Equals(int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value)))
         {*@
-        <a class="btn btn-secondary" asp-action="Chat" asp-route-id="@Model.Id">написать</a>
+        <a class="btn btn-secondary" asp-action="Chat" asp-route-id="@Model.Id">написать/отправить денег</a>
+        @if (Model.Id != UserId && !Model.SubscriptionPerson.Any(ss => ss.SubscriberId == UserId))
+        {
+            <a class="btn btn-secondary" asp-action="Subscribe" asp-route-id="@Model.Id">подписаться</a>
+        }
+        else if (Model.SubscriptionPerson.Any(ss => ss.SubscriberId == UserId))
+        {
+            <a class="btn btn-secondary" asp-action="Unsubscribe" asp-route-id="@Model.Id">отписаться</a>
+
+        }
         @*}  *@
     </div>
 
@@ -34,8 +44,11 @@
     </div>
 
     <div class="post-list">
-        <button class="btn btn-secondary" data-toggle="modal" data-target=".bd-example-modal-lg">создать пост</button>
-        @await Html.PartialAsync("_AddPostPartial", Model)
+        @if (UserId == Context.Request.Query["id"])
+        {
+            <button class="btn btn-secondary" data-toggle="modal" data-target=".bd-example-modal-lg">создать пост</button>
+            @await Html.PartialAsync("_AddPostPartial")
+        }
         <hr />
         <ul>
             @foreach (var post in Model.Post)

@@ -10,6 +10,7 @@ namespace MoneyShareTermApp.Models
     {
         public Post()
         {
+            Mailer = new MoneyMailer();
             Commentary = new HashSet<Commentary>();
             File = new HashSet<File>();
             InversePostNavigation = new HashSet<Post>();

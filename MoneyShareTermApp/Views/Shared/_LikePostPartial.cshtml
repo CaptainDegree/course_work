@@ -1,0 +1,22 @@
+﻿@model Post
+
+<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form asp-action="Like" asp-controller="Posts">
+                <div class="form-group">
+                    <input class="form-control" type="number" name="Euro" style="margin-bottom: 10px" placeholder="€" />
+                    <input class="form-control" type="number" name="Dollar" style="margin-bottom: 10px" placeholder="$" />
+                    <input class="form-control" type="number" name="Ruble" placeholder="₽" />
+                </div>
+
+                <input type="hidden" name="postId" value="@Model.Id" />
+
+                <div class="modal-footer form-group">
+                    <input type="button" class="btn btn-secondary" data-dismiss="modal" value="закрыть" />
+                    <input type="submit" class="btn btn-primary" value="сохранить" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

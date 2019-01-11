@@ -206,6 +206,8 @@ ul {
 .short-msg-tile .short-msg {
     grid-area: short-msg;
     text-overflow: clip;
+    max-width: 300px;
+    justify-self: end;
 }
 
 /*_MsgTilePartials*/
@@ -270,7 +272,7 @@ msg-tile .text-muted {
 
 /*Chat*/
 .msg-list .scrollable-window {
-    height: 600px;
+    height: 400px;
     margin-bottom: 5px;
     overflow-y: scroll;
     position: relative;
@@ -285,6 +287,10 @@ msg-tile .text-muted {
 
 .msg-list li {
     margin-bottom: 15px;
+}
+
+.msg-list .acc {
+    display: none;
 }
 
 /*#curSelect option {
