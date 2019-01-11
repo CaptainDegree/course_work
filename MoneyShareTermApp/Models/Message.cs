@@ -36,13 +36,15 @@ namespace MoneyShareTermApp.Models
         public static readonly string MsgTransfer = "Перевод: ";
         public static readonly string SubTransfer = "Оплата подписки: ";
         public static readonly string LikeTransfer = "Пост оценили: ";
+        public static readonly string SubSet = "На вас подписались";
+        public static readonly string SubRemoved = "От вас отписались";
 
         public int CompareTo(Message other)
         {
             if (other == null)
                 return 1;
 
-            return Mailer.CreationTime.CompareTo(other.Mailer.CreationTime);
+            return Id.CompareTo(other.Id);
         }
     }
 }

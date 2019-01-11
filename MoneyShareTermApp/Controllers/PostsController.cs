@@ -48,12 +48,13 @@ namespace MoneyShareTermApp.Controllers
                 });
                 post.Person = _context.Person
                     .Include(p => p.SubscriptionPrice)
+                    .Include(p => p.Mailer)
                     .FirstOrDefault(p => p.Id == UserId);                
 
                 _context.Add(post);
 
                 // оплата подписчиков // TODO проверить, ловить ошибку
-                foreach (var sub in _context.Subscription.Include(s => s.Person).Include(s => s.Subscriber).Where(s => s.PersonId == UserId))
+                foreach (var sub in _context.Subscription.Include(s => s.Person).ThenInclude(p => p.SubscriptionPrice).Include(s => s.Subscriber).ThenInclude(s => s.Mailer).Where(s => s.PersonId == UserId))
                 {
                     MoneyTransfer.TransMoney(sub.Subscriber, sub.Person, sub.Person.SubscriptionPrice, TransferType.Subscription, _context);
 
@@ -99,6 +100,8 @@ namespace MoneyShareTermApp.Controllers
 
         public IActionResult Like(CurrencySet like, int postId)
         {
+            int id = UserId;
+
             if (like.CheckPositive())
             {
                 // отправка денег
@@ -109,6 +112,8 @@ namespace MoneyShareTermApp.Controllers
                     .Include(p => p.Mailer)
                     .Include(p => p.Person)
                     .FirstOrDefault(p => p.Id == postId);
+
+                id = postTarget.PersonId;
 
                 MoneyTransfer.TransMoney(sender, postTarget.Mailer, like, TransferType.Like, _context);
 
@@ -125,7 +130,7 @@ namespace MoneyShareTermApp.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction("Details", "Profile");
+            return RedirectToAction("Details", "Profile", new { id });
         }
     }
 }

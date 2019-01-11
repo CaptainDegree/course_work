@@ -28,10 +28,7 @@ namespace MoneyShareTermApp.Controllers
             _appEnvironment = appEnvironment;
         }
 
-        public int UserId
-        {
-            get => int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
-        }
+        public int UserId() => int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
 
         // GET: Profile
         [Authorize (Roles = "admin")]
@@ -46,12 +43,16 @@ namespace MoneyShareTermApp.Controllers
         public async Task<IActionResult> Details(int? id) 
         {
             if (id == null)
-                id = UserId;
+                id = UserId();
             
             var person = await _context.Person
                 .Include(p => p.Account)
+                .Include(p => p.CommentPrice)
+                .Include(p => p.MessagePrice)
+                .Include(p => p.SubscriptionPrice)
                 .Include(p => p.Photo)
                 .Include(p => p.Post)
+                .Include(p => p.Role)
                 .Include("Post.Mailer")
                 .Include("Post.Mailer.MoneyTransferTarget")
                 .Include("Post.Mailer.MoneyTransferTarget.Account")
@@ -125,7 +126,7 @@ namespace MoneyShareTermApp.Controllers
 
                     await Authenticate(person); // аутентификация
 
-                    return RedirectToAction("Details", new { UserId }); // TODO проверить 
+                    return RedirectToAction("Details", new { id = UserId() });
                 }
                 else
                     ModelState.AddModelError("", "Некорректные логин и(или) пароль");
@@ -245,13 +246,13 @@ namespace MoneyShareTermApp.Controllers
                 return NotFound();
 
             var posts = await _context.Post
-                .Where(p => p.PersonId == id ||
-                p.Person.SubscriptionSubscriber.Any(s => s.Id == id))
                 .Include(p => p.Mailer)
                     .ThenInclude(p => p.MoneyTransferTarget)
                 .Include(p => p.File)
                 .Include(p => p.Person)
                     .ThenInclude(p => p.Photo)
+                .Include("Person.SubscriptionPerson")
+                .Where(p => p.PersonId == id || p.Person.SubscriptionPerson.Any(s => s.SubscriberId == id))
                 .OrderByDescending(p => p.Mailer.CreationTime)
                 .ToListAsync();
 
@@ -268,19 +269,47 @@ namespace MoneyShareTermApp.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Chats() // TODO отправка денег - тоже сообщение ?, добавить еще в сущность
+        public async Task<IActionResult> Chats()
         {
             List<Message> msgs = new List<Message>();
-            int id = UserId;
+            int id = UserId();
 
-            await _context.Message
+            var peopleIChattedWith = _context.Person
+                .Include(p => p.MessagePerson)
+                .Include(p => p.MessageTarget)
+                .Where(p => p.MessagePerson.Any(m => m.TargetId == id) || p.MessageTarget.Any(m => m.PersonId == id))
+                .ToHashSet();
+
+            foreach (var person in peopleIChattedWith)
+            {
+                var chatMsgs = person.MessagePerson.Where(mp => mp.TargetId == id).ToList();
+                chatMsgs.AddRange(person.MessageTarget.Where(mp => mp.PersonId == id).ToList());
+
+                msgs.Add(chatMsgs.Max());
+            }
+
+            msgs.Sort((x, y) => y.CompareTo(y));
+
+            //await _context.Message
+            //    .Include(m => m.Mailer)
+            //        .ThenInclude(m => m.MoneyTransferTarget)
+            //    .Include(m => m.Person)
+            //        .ThenInclude(p => p.Photo)
+            //    .Include(m => m.Target)
+            //        .ThenInclude(t => t.Photo)
+            //    .Where(m => m.PersonId == UserId() && m.TargetId != UserId()) // только мои
+            //    .GroupBy(m => m.Target)
+            //    .ForEachAsync(tm => msgs.Add(tm.Select(m => m).Max()));
+
+            msgs = await _context.Message
                 .Include(m => m.Mailer)
                     .ThenInclude(m => m.MoneyTransferTarget)
+                .Include(m => m.Person)
+                    .ThenInclude(p => p.Photo)
                 .Include(m => m.Target)
                     .ThenInclude(t => t.Photo)
-                .Where(m => m.TargetId == UserId || m.PersonId == UserId) // только мои или те, что мне 
-                .GroupBy(m => m.Target)
-                .ForEachAsync(tm => msgs.Add(tm.Select(m => m).Max()));
+                .Where(m => msgs.Contains(m))
+                .ToListAsync();
 
             foreach (var m in msgs)
                 foreach (var mtt in m.Mailer.MoneyTransferTarget)
@@ -290,16 +319,17 @@ namespace MoneyShareTermApp.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Chat(int id) // TODO проверять id
+        public async Task<IActionResult> Chat(int id)
         {
             var msgs = _context.Message
                 .Include(m => m.Mailer)
                     .ThenInclude(m => m.MoneyTransferTarget)
+                .Include("Mailer.MoneyTransferPerson")
                 .Include(m => m.Person)
                 .Include("Person.Photo")
                 .Include("Person.Account")
                 .Include("Person.Mailer")
-                .Where(m => m.PersonId.Equals(UserId) && m.TargetId.Equals(id))
+                .Where(m => m.PersonId.Equals(UserId()) && m.TargetId.Equals(id) || m.TargetId.Equals(UserId()) && m.PersonId.Equals(id))
                 .OrderBy(m => m.Mailer.CreationTime);
 
             foreach (var m in msgs)
@@ -338,7 +368,7 @@ namespace MoneyShareTermApp.Controllers
         [Authorize]
         public IActionResult Settings(int id)
         {
-            if (UserId != id)
+            if (UserId() != id)
                 return NotFound();
 
             var person = _context.Person
@@ -358,7 +388,7 @@ namespace MoneyShareTermApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update([ModelBinder(BinderType = typeof(PersonSettingsBinder))] Person updPerson)
         {
-            if (UserId != updPerson.Id)
+            if (UserId() != updPerson.Id)
                 return NotFound();
 
             if (ModelState.IsValid)
@@ -366,9 +396,9 @@ namespace MoneyShareTermApp.Controllers
                 _context.Update(updPerson);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Details", new { UserId });
+                return RedirectToAction("Details", new { id = UserId() });
             }
-            return RedirectToAction("Setting", new { UserId });
+            return RedirectToAction("Setting", new { id = UserId() });
         }
 
         [HttpPost]
@@ -386,7 +416,7 @@ namespace MoneyShareTermApp.Controllers
                     await uploadedFile.CopyToAsync(fileStream);
                 }
 
-                var user = _context.Person.FirstOrDefault(p => p.Id == UserId);
+                var user = _context.Person.FirstOrDefault(p => p.Id == UserId());
                 user.Photo = new Models.File
                 {
                     Link = uploadedFile.FileName
@@ -396,19 +426,28 @@ namespace MoneyShareTermApp.Controllers
                 return RedirectToAction("Details");
             }
 
-            return RedirectToAction("Setting", UserId);
+            return RedirectToAction("Setting", UserId());
         }
 
         [Authorize]
-        public async Task<IActionResult> Subscribe(int id) // TODO сообщить об этом 
+        public async Task<IActionResult> Subscribe(int id)
         {
             Subscription sub = new Subscription
             {
-                SubscriberId = UserId,
+                SubscriberId = UserId(),
                 PersonId = id,
                 Mailer = new MoneyMailer()
             };
 
+            var m = new Message
+            {
+                PersonId = UserId(),
+                TargetId = id,
+                Mailer = new MoneyMailer(),
+                Text = Message.SubSet
+            };
+
+            _context.Add(m);
             _context.Add(sub);
             await _context.SaveChangesAsync();
 
@@ -418,8 +457,17 @@ namespace MoneyShareTermApp.Controllers
         [Authorize]
         public async Task<IActionResult> Unsubscribe(int id)
         {
-            Subscription sub = _context.Subscription.FirstOrDefault(s => s.SubscriberId == UserId && s.PersonId == id);
+            Subscription sub = _context.Subscription.FirstOrDefault(s => s.SubscriberId == UserId() && s.PersonId == id);
 
+            var m = new Message
+            {
+                PersonId = UserId(),
+                TargetId = id,
+                Mailer = new MoneyMailer(),
+                Text = Message.SubRemoved
+            };
+
+            _context.Add(m);
             _context.Subscription.Remove(sub);
             await _context.SaveChangesAsync();
 

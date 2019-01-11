@@ -1,10 +1,23 @@
 ﻿@model Message
 
+@{ 
+    int userId = int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value);
+
+    Person person;
+    if (Model.TargetId == userId)
+    {
+        person = Model.Person;
+    }
+    else { 
+        person = Model.Target;
+    }
+}
+
 <div class="card profile-tile-cont">
-    <a asp-action="Chat" asp-route-id="@Model.TargetId">
+    <a asp-action="Chat" asp-route-id="@person.Id">
         <div class="short-msg-tile card-body">
-            <div class="author"><img src="~/images/@(Model.Target.Photo?.Link ?? "anon.jpg")" /> <span>@Model.Target.SecondName @Model.Target.FirstName</span></div>
-            <div class="short-msg"><label>@(Model.PersonId == int.Parse(User.Claims.FirstOrDefault(cl => cl.Type == ClaimTypes.PrimarySid).Value) ? "Me: " : "") @await Html.PartialAsync("_MsgTilePartial", Model)</label></div>
+            <div class="author"><img src="~/images/@(person.Photo?.Link ?? "anon.jpg")" /> <span>@person.SecondName @person.FirstName</span></div>
+            <div class="short-msg"><label>@(Model.PersonId == userId ? "Me: " : "") @await Html.PartialAsync("_MsgTilePartial", Model)</label></div>
         </div>
     </a>
 </div>

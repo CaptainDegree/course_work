@@ -32,7 +32,7 @@
             <div class="input-group-append">
                 <select class="btn btn-outline-secondary" id="typeSelect" asp-items="Html.GetEnumSelectList<MsgType>()"></select>
                 <select class="btn btn-outline-secondary" id="curSelect" asp-items="Html.GetEnumSelectList<Currency>()"></select> @{ /*TODO можно поменять названия на знаки*/ }
-                <input type="button" id="button" name="button" class="btn btn-outline-secondary" value="отправить" />
+                <input type="submit" id="button" name="button" class="btn btn-outline-secondary" value="отправить" />
             </div>
         </div>
     </form>

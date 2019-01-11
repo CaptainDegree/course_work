@@ -57,7 +57,7 @@
     <div class="container">
         <nav class="navbar flex-column nav-pills">
             <ul>
-                <li><a class="nav-link @(ViewData["Title"].Equals("Details") && Context.Request.Path.ToString().EndsWith(id) ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Details" asp-route-id="@id">профиль</a></li>
+                <li><a class="nav-link @(ViewData["Title"].Equals("Details") && (Context.Request.Path.ToString().EndsWith(id) || Context.Request.Path.ToString() == "/") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Details" asp-route-id="@id">профиль</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("Posts") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Posts" asp-route-id="@id">лента</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("Chats") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="Chats" asp-route-id="@id">беседы</a></li>
                 <li><a class="nav-link @(ViewData["Title"].Equals("People") ? "active" : "")" aria-selected="true" role="tab" asp-controller="Profile" asp-action="People">люди</a></li>

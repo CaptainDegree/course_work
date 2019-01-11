@@ -1,6 +1,12 @@
 ﻿$(document).ready(function () {
     $('#msg-scrollable-window').scrollTop($('#uml').height());
     setInterval(load_messes, 1000);
+    //$('#msg').keypress(function (e) {
+    //    if (e.which == 13) {
+    //        jQuery(this).blur();
+    //        jQuery('#button').focus().click();
+    //    }
+    //});
 
     $('#button').click(function () {
         var targetId = $('#targetId').val();
@@ -18,7 +24,6 @@
                         $('input:hidden[name="__RequestVerificationToken"]').val()
                 },
                 success: function (res) {
-                    console.log(res);
                     if (res === false)
                         alert("ошибка!");
                     else {

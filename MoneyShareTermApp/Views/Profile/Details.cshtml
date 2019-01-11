@@ -37,14 +37,21 @@
     <div class="description">
         <h3>описание</h3>
         <ul>
+            @*<li><div>Стоимость комментирования: </div><div>@Model.CommentPrice.GetAll()</div></li>*@
+            <li><div>Стоимость сообщения: </div><div>@Model.MessagePrice.GetAll()</div></li>
+            <li><div>Стоимость подписки: </div><div>@Model.SubscriptionPrice.GetAll()</div></li>
             <li><div>День рождения: </div><div>@Model.Birthday.ToShortDateString()</div></li>
             <li><div>Логин: </div><div>@Model.Login</div></li>
             <li><div>Телефон: </div><div>@Model.PhoneNumber</div></li>
+            @if (Model.Role.Name == "admin")
+            {
+                <li><div>Админ</div></li>
+            }
         </ul>
     </div>
 
     <div class="post-list">
-        @if (UserId == Context.Request.Query["id"])
+        @if (Context.Request.Path.ToString().EndsWith(UserId.ToString()) || Context.Request.Path.ToString() == "/")
         {
             <button class="btn btn-secondary" data-toggle="modal" data-target=".bd-example-modal-lg">создать пост</button>
             @await Html.PartialAsync("_AddPostPartial")

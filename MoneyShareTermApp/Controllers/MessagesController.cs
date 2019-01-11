@@ -116,7 +116,7 @@ namespace MoneyShareTermApp.Controllers
                         MoneyTransfer.TransMoney(sender, m.Mailer, payment, TransferType.Message, _context);
                         break;
                     case MsgType.Money:
-                        MoneyTransfer.TransMoney(sender, m.Mailer, payment, TransferType.Trans, _context);
+                        MoneyTransfer.TransMoney(sender, target.Mailer, payment, TransferType.Trans, _context);
                         break;
                     default:
                         throw new ArgumentException();
@@ -142,7 +142,7 @@ namespace MoneyShareTermApp.Controllers
                 .Include("Person.Photo")
                 .Include("Person.Account")
                 .Include("Person.Mailer")
-                .Where(m => m.PersonId.Equals(UserId) && m.TargetId.Equals(targetId) && m.Id > msgId)
+                .Where(m => (m.PersonId.Equals(UserId) && m.TargetId.Equals(targetId) || m.PersonId.Equals(targetId) && m.TargetId.Equals(UserId)) && m.Id > msgId)
                 .OrderBy(m => m.Mailer.CreationTime);
 
             foreach (var m in msgs)
